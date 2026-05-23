@@ -266,19 +266,22 @@ function oppdaterHotell(index, hotelId) {
   currentPlan[index].hotell = hotelId || null;
   lagrePlan();
 
-  // Re-render kroppen for å vise booking-knapper
-  const body = document.getElementById(`dag-body-${index}`);
-  if (body) {
-    body.innerHTML = lagDagCardBody(currentPlan[index], index);
-  }
-
-  // Oppdater sted i header
-  const card = document.getElementById(`dag-card-${index}`);
-  if (card) {
-    const hotell = hotelId ? HOTELLER.find(h => h.id === hotelId) : null;
-    const stedEl = card.querySelector('.dag-sted');
-    if (stedEl) {
-      stedEl.textContent = `📍 ${currentPlan[index].sted}${hotell ? ' · 🏨 ' + hotell.navn : ''}`;
+  if (visReiseModus) {
+    // I "Vis reise"-modus: tegn om hele tidslinja slik at endringen vises
+    renderPlan();
+  } else {
+    // I redigeringsmodus: oppdater bare dette kortets innhold
+    const body = document.getElementById(`dag-body-${index}`);
+    if (body) {
+      body.innerHTML = lagDagCardBody(currentPlan[index], index);
+    }
+    const card = document.getElementById(`dag-card-${index}`);
+    if (card) {
+      const hotell = hotelId ? HOTELLER.find(h => h.id === hotelId) : null;
+      const stedEl = card.querySelector('.dag-sted');
+      if (stedEl) {
+        stedEl.textContent = `📍 ${currentPlan[index].sted}${hotell ? ' · 🏨 ' + hotell.navn : ''}`;
+      }
     }
   }
 
@@ -294,12 +297,15 @@ function toggleAktivitet(dagIndex, turId, element) {
   const idx = dag.aktiviteter.indexOf(turId);
   if (idx > -1) {
     dag.aktiviteter.splice(idx, 1);
-    element.classList.remove('selected');
+    if (element) element.classList.remove('selected');
   } else {
     dag.aktiviteter.push(turId);
-    element.classList.add('selected');
+    if (element) element.classList.add('selected');
   }
   lagrePlan();
+
+  if (visReiseModus) renderPlan();
+  if (typeof oppdaterReiserute === 'function') oppdaterReiserute();
 }
 
 // ---- Oppdater notater ----

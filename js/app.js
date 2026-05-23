@@ -441,13 +441,14 @@ function velgDagForTur(turId) {
 
   const dagerHtml = currentPlan.map((dag, i) => {
     const erValgt = (dag.aktiviteter || []).includes(turId);
+    const handling = erValgt ? 'Fjern fra' : 'Legg til';
     return `
       <button class="dag-velger-btn ${erValgt ? 'valgt' : ''}"
-              onclick="toggleAktivitet(${i},'${turId}',this);this.closest('.dag-velger-liste').querySelectorAll('.dag-velger-btn').forEach(b=>b.classList.remove('valgt'));this.classList.toggle('valgt',${JSON.stringify(!erValgt)});visToast('${tur.navn} ${erValgt ? 'fjernet fra' : 'lagt til'} dag ${dag.dag} ✓');oppdaterReiserute()">
+              onclick="toggleAktivitet(${i},'${turId}',null);lukkModal();visToast('${tur.navn} lagt til dag ${dag.dag} ✓')">
         <span class="dag-velger-nr">${dag.dag}</span>
         <span class="dag-velger-info">
           <span class="dag-velger-dato">${dag.dagNavn}</span>
-          <span class="dag-velger-sted">${dag.sted}${erValgt ? ' · ✓ Lagt til' : ''}</span>
+          <span class="dag-velger-sted">${dag.sted}${erValgt ? ' · ✓ Allerede lagt til' : ''}</span>
         </span>
       </button>`;
   }).join('');
