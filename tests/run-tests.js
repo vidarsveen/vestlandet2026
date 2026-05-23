@@ -10,12 +10,12 @@ ${src}
 // Export all constants
 ({
   APP_CONFIG, HOTELLER, HYTTER, CAMPING, TURER, SEVERDIGHETER,
-  STANDARD_PLAN, LENKER, lagBookingUrl, datoForDag, RESTAURANTER
+  STANDARD_PLAN, LENKER, lagBookingUrl, lagHotellBookingUrl, datoForDag, RESTAURANTER
 });
 `;
 const appData = vm.runInNewContext(wrapped, { Date, JSON, Array, Object, Math, encodeURIComponent });
 
-const { APP_CONFIG, HOTELLER, HYTTER, TURER, SEVERDIGHETER, STANDARD_PLAN, LENKER, lagBookingUrl, datoForDag } = appData;
+const { APP_CONFIG, HOTELLER, HYTTER, TURER, SEVERDIGHETER, STANDARD_PLAN, LENKER, lagBookingUrl, lagHotellBookingUrl, datoForDag } = appData;
 
 let pass = 0, fail = 0;
 
@@ -52,12 +52,14 @@ t('STANDARD_PLAN 9 dager (inkl. bryllupsdag)', function() {
   if (!Array.isArray(STANDARD_PLAN) || STANDARD_PLAN.length !== 9) throw new Error('Fant ' + (STANDARD_PLAN ? STANDARD_PLAN.length : 'undefined') + ' dager, forventet 9');
   return STANDARD_PLAN.length + ' dager (12.–20. juni)';
 });
-t('Brakanes er starthotell', function() {
+t('Brakanes er starthotell (dag 1 og 2)', function() {
   var b = HOTELLER.find(function(h) { return h.id === 'brakanes'; });
   if (!b) throw new Error('Ikke funnet');
   if (!b.startHotell) throw new Error('startHotell-flagg mangler');
   if (STANDARD_PLAN[0].hotell !== 'brakanes') throw new Error('Dag 1 er ikke Brakanes');
-  return 'OK';
+  if (STANDARD_PLAN[1].hotell !== 'brakanes') throw new Error('Dag 2 er ikke Brakanes');
+  if (STANDARD_PLAN[2].hotell !== null) throw new Error('Dag 3 skal vaere ledig (null), fant: ' + STANDARD_PLAN[2].hotell);
+  return 'Dag 1+2 Brakanes, dag 3 ledig';
 });
 t('Dronningstien finnes', function() {
   var d = TURER.find(function(t) { return t.id === 'dronningstien'; });
@@ -96,7 +98,19 @@ t('Koordinater i reiseomradet', function() {
 
 // === BOOKING-LENKER ===
 console.log('\n=== BOOKING-LENKER ===');
-t('lagBookingUrl-funksjon', function() {
+t('lagHotellBookingUrl – direkte hotellside', function() {
+  var url = lagHotellBookingUrl('brakanes-hotel', '2026-06-12', '2026-06-13');
+  if (!url.includes('/hotel/no/brakanes-hotel')) throw new Error('Feil URL-format, fant: ' + url.substring(0, 60));
+  if (!url.includes('2026-06-12')) throw new Error('Innsjekk mangler');
+  if (!url.includes('group_adults=2')) throw new Error('2 voksne mangler');
+  return 'Slug-URL korrekt: /hotel/no/brakanes-hotel';
+});
+t('Alle hoteller har bookingSlug', function() {
+  var u = HOTELLER.filter(function(h) { return !h.bookingSlug; });
+  if (u.length) throw new Error('Mangler slug: ' + u.map(function(h) { return h.navn; }).join(', '));
+  return HOTELLER.length + '/' + HOTELLER.length + ' har bookingSlug';
+});
+t('lagBookingUrl (bakoverkompatibilitet)', function() {
   var url = lagBookingUrl('Brakanes Hotell', 'Ulvik', '2026-06-13', '2026-06-14');
   if (!url.includes('booking.com')) throw new Error('Ikke booking.com URL');
   if (!url.includes('2026-06-13')) throw new Error('Innsjekk mangler');

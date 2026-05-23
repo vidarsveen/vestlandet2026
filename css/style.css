@@ -1085,3 +1085,140 @@ a:hover { text-decoration: underline; }
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   #bottom-nav { padding-bottom: env(safe-area-inset-bottom); height: calc(var(--nav-h) + env(safe-area-inset-bottom)); }
 }
+
+/* ==========================================================================
+   PLAN-VIEW TOGGLE (Rediger / Vis reise)
+   ========================================================================== */
+
+.plan-header-actions {
+  flex-wrap: wrap;
+}
+
+.plan-view-toggle {
+  display: flex;
+  background: rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 3px;
+  gap: 3px;
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+.toggle-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-radius: 16px;
+  color: rgba(255,255,255,0.75);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 10px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.toggle-btn.active {
+  background: var(--white);
+  color: var(--navy);
+}
+
+/* ==========================================================================
+   REISETIDSLINJE
+   ========================================================================== */
+
+.reise-tidslinje {
+  padding: 16px 16px 48px;
+}
+
+.reise-stopp {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.stopp-sirkel {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s;
+}
+
+.reise-stopp:hover .stopp-sirkel {
+  transform: scale(1.08);
+}
+
+.reise-stopp.ledig .stopp-sirkel {
+  background: #cdd5df;
+  color: #666;
+}
+
+.stopp-innhold {
+  padding: 4px 0 12px;
+  flex: 1;
+}
+
+.stopp-dato {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 2px;
+}
+
+.stopp-sted {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.reise-stopp.ledig .stopp-sted {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.stopp-aktiviteter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 5px;
+}
+
+.akt-pill {
+  display: inline-block;
+  font-size: 12px;
+  background: var(--sky);
+  color: var(--navy);
+  border-radius: 12px;
+  padding: 3px 9px;
+  font-weight: 500;
+}
+
+.reise-kobling {
+  width: 2px;
+  height: 28px;
+  margin-left: 18px;
+  border-radius: 1px;
+}
+
+.reise-kobling.solid {
+  background: var(--navy);
+}
+
+.reise-kobling.dashed {
+  background: repeating-linear-gradient(
+    to bottom,
+    #a0b0c4 0 5px,
+    transparent 5px 11px
+  );
+}

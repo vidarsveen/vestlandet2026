@@ -16,6 +16,12 @@ const APP_CONFIG = {
 // BOOKING URL HELPERS
 // =====================================================================
 
+// Direkte hotell-side URL (slug-basert — ingen søkeside som gir feil treff)
+function lagHotellBookingUrl(slug, innsjekk, utsjekk) {
+  return `https://www.booking.com/hotel/no/${slug}.html?checkin=${innsjekk}&checkout=${utsjekk}&group_adults=2&no_rooms=1&lang=nb&selected_currency=NOK`;
+}
+
+// Beholdes for bakoverkompatibilitet (brukes i tester)
 function lagBookingUrl(hotelNavn, sted, innsjekk, utsjekk) {
   const sokeord = encodeURIComponent(hotelNavn + ', ' + sted + ', Norway');
   return `https://www.booking.com/searchresults.html?ss=${sokeord}&checkin=${innsjekk}&checkout=${utsjekk}&group_adults=2&no_rooms=1&lang=nb&selected_currency=NOK`;
@@ -48,6 +54,7 @@ const HOTELLER = [
     web: 'https://www.brakanes-hotel.no',
     wiki: 'https://no.wikipedia.org/wiki/Ulvik',
     bookingSearch: 'Brakanes Hotell Ulvik',
+    bookingSlug: 'brakanes-hotel',
     startHotell: true,
     bryllup: true
   },
@@ -65,23 +72,25 @@ const HOTELLER = [
     telefon: '+47 53 67 00 00',
     web: 'https://www.hotel-ullensvang.no',
     wiki: 'https://no.wikipedia.org/wiki/Hotel_Ullensvang',
-    bookingSearch: 'Ullensvang Hotel Lofthus Hardanger'
+    bookingSearch: 'Ullensvang Hotel Lofthus Hardanger',
+    bookingSlug: 'ullensvang'
   },
   {
     id: 'hardanger-hotel',
-    navn: 'Hardanger Hotel',
+    navn: 'Kinsarvik Fjordhotel',
     sted: 'Kinsarvik',
     region: 'Hardanger',
     lat: 60.3745,
     lng: 6.7280,
     stjerner: 3,
     prisklasse: '🟡🟡',
-    beskrivelse: 'Trivelig hotell i Kinsarvik ved munningen av Kinso-elven. Endepunkt for Dronningstien. God beliggenhet for utforsking av Hardanger.',
+    beskrivelse: 'Trivelig fjordhotell i Kinsarvik ved munningen av Kinso-elven (BW Signature Collection). Endepunkt for Dronningstien. God beliggenhet for utforsking av Hardanger.',
     fasiliteter: ['Restaurant', 'Bar', 'Parkering', 'Fjordnær', 'WiFi'],
     telefon: '+47 53 67 19 00',
-    web: 'https://www.hardangerhotel.no',
+    web: 'https://www.bestwestern.no',
     wiki: 'https://no.wikipedia.org/wiki/Kinsarvik',
-    bookingSearch: 'Hardanger Hotel Kinsarvik'
+    bookingSearch: 'Kinsarvik Fjordhotel',
+    bookingSlug: 'first-hotel-kinsarvik'
   },
   {
     id: 'utne',
@@ -97,23 +106,25 @@ const HOTELLER = [
     telefon: '+47 53 66 64 00',
     web: 'https://www.utnehotel.no',
     wiki: 'https://no.wikipedia.org/wiki/Utne_Hotel',
-    bookingSearch: 'Utne Hotel Hardanger'
+    bookingSearch: 'Utne Hotel Hardanger',
+    bookingSlug: 'utne'
   },
   {
     id: 'eidfjord',
-    navn: 'Quality Hotel & Resort Eidfjord',
+    navn: 'Quality Hotel Vøringfoss',
     sted: 'Eidfjord',
     region: 'Hardanger',
     lat: 60.4674,
     lng: 7.0700,
     stjerner: 4,
     prisklasse: '🟡🟡🟡',
-    beskrivelse: 'Moderne resort i dramatiske Eidfjord omgitt av fjell og fosser. Nær Hardangervidda Nasjonalparksenter og Vøringsfossen.',
+    beskrivelse: 'Moderne hotell i dramatiske Eidfjord omgitt av fjell og fosser (Nordic Choice Hotels). Nær Hardangervidda Nasjonalparksenter og Vøringsfossen.',
     fasiliteter: ['Restaurant', 'Bar', 'Spa', 'Pool', 'Parkering', 'WiFi'],
     telefon: '+47 53 66 52 64',
     web: 'https://www.nordicchoicehotels.no',
     wiki: 'https://no.wikipedia.org/wiki/Eidfjord',
-    bookingSearch: 'Quality Hotel Eidfjord Norway'
+    bookingSearch: 'Quality Hotel Voringfoss Eidfjord',
+    bookingSlug: 'voringfoss-hotel'
   },
   {
     id: 'fretheim',
@@ -129,7 +140,8 @@ const HOTELLER = [
     telefon: '+47 57 63 63 00',
     web: 'https://www.fretheim-hotel.no',
     wiki: 'https://no.wikipedia.org/wiki/Fl%C3%A5m',
-    bookingSearch: 'Fretheim Hotel Flåm Norway'
+    bookingSearch: 'Fretheim Hotel Flåm Norway',
+    bookingSlug: 'fretheim'
   },
   {
     id: 'flamsbrygga',
@@ -145,7 +157,8 @@ const HOTELLER = [
     telefon: '+47 57 63 20 50',
     web: 'https://www.flamsbrygga.no',
     wiki: 'https://no.wikipedia.org/wiki/Fl%C3%A5m',
-    bookingSearch: 'Flåmsbrygga Hotel Flåm'
+    bookingSearch: 'Flåmsbrygga Hotel Flåm',
+    bookingSlug: 'flamsbrygga-hotell'
   },
   {
     id: 'kviknes',
@@ -161,7 +174,8 @@ const HOTELLER = [
     telefon: '+47 57 69 42 00',
     web: 'https://www.kviknes.no',
     wiki: 'https://no.wikipedia.org/wiki/Kviknes_Hotel',
-    bookingSearch: 'Kviknes Hotel Balestrand Sognefjord'
+    bookingSearch: 'Kviknes Hotel Balestrand Sognefjord',
+    bookingSlug: 'kviknes'
   },
   {
     id: 'sogndal',
@@ -177,7 +191,8 @@ const HOTELLER = [
     telefon: '+47 57 62 77 00',
     web: 'https://www.nordicchoicehotels.no',
     wiki: 'https://no.wikipedia.org/wiki/Sogndal',
-    bookingSearch: 'Quality Hotel Sogndal Norway'
+    bookingSearch: 'Quality Hotel Sogndal Norway',
+    bookingSlug: 'quality-sogndal'
   },
   {
     id: 'laerdal',
@@ -193,7 +208,8 @@ const HOTELLER = [
     telefon: '+47 57 66 69 00',
     web: 'https://www.lindstromhotel.no',
     wiki: 'https://no.wikipedia.org/wiki/L%C3%A6rdal',
-    bookingSearch: 'Lindstrøm Hotel Lærdal Norway'
+    bookingSearch: 'Lindstrøm Hotel Lærdal Norway',
+    bookingSlug: 'lindstra-m'
   }
 ];
 
@@ -619,10 +635,10 @@ const STANDARD_PLAN = [
     dato: '2026-06-12',
     dagNavn: 'Fredag 12. juni',
     sted: 'Ulvik',
-    tittel: '💒 Bryllupsdag – Brakanes',
+    tittel: '💒 Bryllup i Ulvik – Brakanes',
     hotell: 'brakanes',
     aktiviteter: [],
-    notater: 'Ankomst Brakanes Hotell til bryllup! 🥂 Fest, feiring og fjord. Første av to netter på Brakanes. Parkering inkludert ved hotellet.',
+    notater: 'Ankomst Brakanes Hotell. Vi er gjester i et bryllup 🥂 Fest og feiring langs fjorden. Første av to netter på Brakanes. Parkering inkludert ved hotellet.',
     egne: []
   },
   {
@@ -630,7 +646,7 @@ const STANDARD_PLAN = [
     dato: '2026-06-13',
     dagNavn: 'Lørdag 13. juni',
     sted: 'Ulvik',
-    tittel: 'Dagen etter – Ulvik og eplesider',
+    tittel: 'Dagen etter bryllupet – Ulvik',
     hotell: 'brakanes',
     aktiviteter: [],
     notater: 'Andre natt på Brakanes. Slapp dag etter bryllupet. Utforsk Ulvik sentrum, smak på lokal eplesider hos Hardanger Saft og Siderfabrikk. Aftenstur langs fjorden. 🍎',
@@ -640,66 +656,66 @@ const STANDARD_PLAN = [
     dag: 3,
     dato: '2026-06-14',
     dagNavn: 'Søndag 14. juni',
-    sted: 'Lofthus / Kinsarvik',
-    tittel: 'Dronningstien 🥾',
-    hotell: 'ullensvang',
-    aktiviteter: ['dronningstien'],
-    notater: 'Sjekk ut fra Brakanes. Kjør til Opedal og gå den legendariske Dronningstien til Kinsarvik (5 timer, 12 km). Sjekk inn på Ullensvang Hotel om kvelden.',
+    sted: 'Hardanger',
+    tittel: 'Dag 3 – Ledig',
+    hotell: null,
+    aktiviteter: [],
+    notater: '',
     egne: []
   },
   {
     dag: 4,
     dato: '2026-06-15',
     dagNavn: 'Mandag 15. juni',
-    sted: 'Eidfjord',
-    tittel: 'Vøringsfossen & Hardangervidda',
-    hotell: 'eidfjord',
-    aktiviteter: ['voringsfossen'],
-    notater: 'Kjør via Kinsarvik og Eidfjord. Besøk Vøringsfossen (182 m) og Hardangervidda Nasjonalparksenter. Overnatt i Eidfjord.',
+    sted: 'Hardanger',
+    tittel: 'Dag 4 – Ledig',
+    hotell: null,
+    aktiviteter: [],
+    notater: '',
     egne: []
   },
   {
     dag: 5,
     dato: '2026-06-16',
     dagNavn: 'Tirsdag 16. juni',
-    sted: 'Flåm',
-    tittel: 'Flåmsbana & Nærøyfjord',
-    hotell: 'fretheim',
-    aktiviteter: ['naeroy'],
-    notater: 'Kjør via Gudvangen og stopp ved Nærøyfjorden (UNESCO). Ta Flåmsbana opp til Myrdal og ned igjen. Aftensbesøk på Ægir Bryggeri! 🍺',
+    sted: 'Flåm / Aurland',
+    tittel: 'Dag 5 – Ledig',
+    hotell: null,
+    aktiviteter: [],
+    notater: '',
     egne: []
   },
   {
     dag: 6,
     dato: '2026-06-17',
     dagNavn: 'Onsdag 17. juni',
-    sted: 'Aurland / Balestrand',
-    tittel: 'Stegastein & Sognefjord',
-    hotell: 'kviknes',
-    aktiviteter: ['stegastein'],
-    notater: 'Morgentur til Stegastein utsiktspunkt (650 m over fjorden!). Kjør langs Sognefjorden til Balestrand og sjekk inn på historiske Kviknes Hotel.',
+    sted: 'Sognefjord',
+    tittel: 'Dag 6 – Ledig',
+    hotell: null,
+    aktiviteter: [],
+    notater: '',
     egne: []
   },
   {
     dag: 7,
     dato: '2026-06-18',
     dagNavn: 'Torsdag 18. juni',
-    sted: 'Lærdal',
-    tittel: 'Borgund stavkirke & Gamle Lærdal',
-    hotell: 'laerdal',
+    sted: 'Lærdal / Borgund',
+    tittel: 'Dag 7 – Ledig',
+    hotell: null,
     aktiviteter: [],
-    notater: 'Kjør til Borgund stavkirke (ca. 1180 e.Kr.) – en av Norges best bevarte. Vandre rundt i vakre Gamle Lærdalsøyri med 161 fredede hus. Overnatt på Lindstrøm Hotel.',
+    notater: '',
     egne: []
   },
   {
     dag: 8,
     dato: '2026-06-19',
     dagNavn: 'Fredag 19. juni',
-    sted: 'Sogndal',
-    tittel: 'Siste fjorddag',
-    hotell: 'sogndal',
+    sted: 'Sogn',
+    tittel: 'Dag 8 – Ledig',
+    hotell: null,
     aktiviteter: [],
-    notater: 'Siste fjorddag! Besøk Sognefjord-senteret eller gjør en kort tur. Overnatt i Sogndal for tidlig avreise neste dag.',
+    notater: '',
     egne: []
   },
   {
@@ -707,10 +723,10 @@ const STANDARD_PLAN = [
     dato: '2026-06-20',
     dagNavn: 'Lørdag 20. juni',
     sted: 'Hjemreise',
-    tittel: 'God tur! 🏔',
+    tittel: 'Hjemreise 🏔',
     hotell: null,
     aktiviteter: [],
-    notater: 'Hjemreise fra Sogndal. Takk for en fantastisk fjordtur!',
+    notater: '',
     egne: []
   }
 ];

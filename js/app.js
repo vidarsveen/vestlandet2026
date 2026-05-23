@@ -347,7 +347,9 @@ function visStedModal(type, id) {
   const stjernerHtml = h.stjerner ? '⭐'.repeat(h.stjerner) : '';
   const idag    = APP_CONFIG.startDate;
   const imorgen = datoForDag(1);
-  const bookUrl = lagBookingUrl(h.navn, h.sted, idag, imorgen);
+  const bookUrl = h.bookingSlug
+    ? lagHotellBookingUrl(h.bookingSlug, idag, imorgen)
+    : lagBookingUrl(h.navn, h.sted, idag, imorgen);
 
   body.innerHTML = `
     <p style="font-size:14px;line-height:1.6;color:#1a2433;margin-bottom:14px">${h.beskrivelse}</p>
@@ -363,7 +365,7 @@ function visStedModal(type, id) {
     <div style="margin-bottom:14px;display:flex;flex-direction:column;gap:6px">
       ${h.telefon ? `<div style="font-size:13px;color:#5a6b7c">📞 <a href="tel:${h.telefon}" style="color:#2d8c6f">${h.telefon}</a></div>` : ''}
       <div style="font-size:13px;color:#5a6b7c">🏷 Prisklasse: ${h.prisklasse || '–'}</div>
-      ${h.bryllup ? `<div style="font-size:13px;color:#c9a84c;font-weight:600">💒 Bryllupshotell – 12. juni 2026</div>` : ''}
+      ${h.bryllup ? `<div style="font-size:13px;color:#c9a84c;font-weight:600">💒 Bryllupsgjester her 12. juni 2026</div>` : ''}
     </div>
 
     <div style="display:flex;flex-direction:column;gap:8px">

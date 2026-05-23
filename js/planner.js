@@ -4,6 +4,7 @@
 
 const STORAGE_KEY = 'hardanger-sogn-plan-v2';
 let currentPlan = [];
+let visReiseModus = false;
 
 // ---- Init planlegger ----
 function initPlanner() {
@@ -45,16 +46,98 @@ function nullstillPlan() {
   visToast('Plan nullstilt til forslag 🔄');
 }
 
+// ---- Toggle mellom rediger og vis-reise ----
+function toggleVisReise() {
+  visReiseModus = !visReiseModus;
+  renderPlan();
+}
+
+// ---- Oppdater toggle-knappenes active-state ----
+function oppdaterToggleKnapper() {
+  const redigerBtn = document.getElementById('toggle-rediger');
+  const reiseBtn   = document.getElementById('toggle-reise');
+  if (!redigerBtn || !reiseBtn) return;
+  redigerBtn.classList.toggle('active', !visReiseModus);
+  reiseBtn.classList.toggle('active',   visReiseModus);
+}
+
 // ---- Render hele planen ----
 function renderPlan() {
   const container = document.getElementById('plan-liste');
   if (!container) return;
   container.innerHTML = '';
 
-  currentPlan.forEach((dag, index) => {
-    const card = lagDagCard(dag, index);
-    container.appendChild(card);
+  if (visReiseModus) {
+    container.appendChild(lagReiseoversikt());
+  } else {
+    currentPlan.forEach((dag, index) => {
+      const card = lagDagCard(dag, index);
+      container.appendChild(card);
+    });
+  }
+  oppdaterToggleKnapper();
+}
+
+// ---- Lag visuell reisetidslinje ----
+function lagReiseoversikt() {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'reise-tidslinje';
+
+  currentPlan.forEach((dag, i) => {
+    const hotell = dag.hotell ? HOTELLER.find(h => h.id === dag.hotell) : null;
+    const hyt    = dag.hotell ? HYTTER.find(h => h.id === dag.hotell) : null;
+    const erBooket = !!(hotell || hyt);
+    const stedNavn = hotell ? hotell.navn : (hyt ? hyt.navn + ' (DNT)' : null);
+
+    // Aktivitetspills
+    const aktPills = (dag.aktiviteter || []).map(id => {
+      const tur = TURER.find(t => t.id === id);
+      if (!tur) return '';
+      const ikon = tur.vanskelighetsgrad === 'Lett' ? '🟢' : tur.vanskelighetsgrad === 'Middels' ? '🟡' : '🔴';
+      return `<span class="akt-pill">${ikon} ${tur.navn}</span>`;
+    }).join('');
+
+    // Bryllups-pill for dag 1
+    const ekstraPills = (dag.dag === 1) ? '<span class="akt-pill">💒 Bryllup</span>' : '';
+
+    const stopp = document.createElement('div');
+    stopp.className = `reise-stopp ${erBooket ? 'booked' : 'ledig'}`;
+    stopp.id = `stopp-${i}`;
+    stopp.innerHTML = `
+      <div class="stopp-sirkel">${dag.dag}</div>
+      <div class="stopp-innhold">
+        <div class="stopp-dato">${dag.dagNavn}</div>
+        <div class="stopp-sted">${dag.sted}${stedNavn ? ' · 🏨 ' + stedNavn : ''}</div>
+        ${(aktPills || ekstraPills) ? `<div class="stopp-aktiviteter">${ekstraPills}${aktPills}</div>` : ''}
+      </div>`;
+
+    // Klikk → bytter til redigeringsmodus og scroller til kortet
+    stopp.style.cursor = 'pointer';
+    stopp.addEventListener('click', () => {
+      visReiseModus = false;
+      renderPlan();
+      setTimeout(() => {
+        const card = document.getElementById(`dag-card-${i}`);
+        if (card) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          card.classList.add('expanded');
+        }
+      }, 80);
+    });
+
+    wrapper.appendChild(stopp);
+
+    // Kobling til neste dag (ikke etter siste)
+    if (i < currentPlan.length - 1) {
+      const nesteDag  = currentPlan[i + 1];
+      const nesteBoket = !!(HOTELLER.find(h => h.id === nesteDag.hotell) || HYTTER.find(h => h.id === nesteDag.hotell));
+      const kobling = document.createElement('div');
+      kobling.className = `reise-kobling ${(erBooket && nesteBoket) ? 'solid' : 'dashed'}`;
+      wrapper.appendChild(kobling);
+    }
   });
+
+  return wrapper;
 }
 
 // ---- Lag et dagkort ----
@@ -123,7 +206,9 @@ function lagDagCardBody(dag, index) {
     const utDato = new Date(dag.dato);
     utDato.setDate(utDato.getDate() + 1);
     const utsjekk = utDato.toISOString().split('T')[0];
-    const bookUrl = lagBookingUrl(hotell.navn, hotell.sted, innsjekk, utsjekk);
+    const bookUrl = hotell.bookingSlug
+      ? lagHotellBookingUrl(hotell.bookingSlug, innsjekk, utsjekk)
+      : lagBookingUrl(hotell.navn, hotell.sted, innsjekk, utsjekk);
     bookingHtml = `
       <a class="btn btn-primary btn-sm" href="${bookUrl}" target="_blank" rel="noopener">
         📅 Book ${hotell.navn}

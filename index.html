@@ -85,6 +85,10 @@
         <h2>📅 Dagsplan for turen</h2>
         <p>12.–20. juni 2026 · Trykk på en dag for å redigere</p>
         <div class="plan-header-actions">
+          <div class="plan-view-toggle">
+            <button id="toggle-rediger" class="toggle-btn active" onclick="toggleVisReise()">✏️ Rediger</button>
+            <button id="toggle-reise"   class="toggle-btn"        onclick="toggleVisReise()">🗺 Vis reise</button>
+          </div>
           <button class="btn btn-gull btn-sm" onclick="eksporterPlan()">
             📤 Del plan
           </button>
