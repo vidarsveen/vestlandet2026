@@ -1311,3 +1311,34 @@ a:hover { text-decoration: underline; }
   font-size: 12px;
   color: var(--text-muted);
 }
+
+/* ==========================================================================
+   EGET HOTELL — geocoding-skjema
+   ========================================================================== */
+
+.eget-hotell-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-family: var(--font-main);
+  color: var(--text);
+  background: var(--white);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.field-input:focus {
+  border-color: var(--navy);
+}
+
+.field-input::placeholder {
+  color: #a0adb8;
+}

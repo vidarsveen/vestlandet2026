@@ -5,8 +5,33 @@
 let mapInitialized = false;
 let currentTab = 'kart';
 
+// =====================================================================
+// EGENDEFINERTE HOTELLER (søk via OpenStreetMap Nominatim)
+// =====================================================================
+
+const EGNE_HOTELLER_KEY = 'hardanger-egne-hoteller-v1';
+let egneHoteller = [];
+
+function lastEgneHoteller() {
+  try {
+    const lagret = localStorage.getItem(EGNE_HOTELLER_KEY);
+    if (lagret) {
+      egneHoteller = JSON.parse(lagret);
+      // Legg til i global HOTELLER-liste slik at de vises overalt
+      egneHoteller.forEach(h => {
+        if (!HOTELLER.find(x => x.id === h.id)) HOTELLER.push(h);
+      });
+    }
+  } catch(e) { console.warn('Kunne ikke laste egne hoteller', e); }
+}
+
+function lagreEgneHoteller() {
+  localStorage.setItem(EGNE_HOTELLER_KEY, JSON.stringify(egneHoteller));
+}
+
 // ---- Start appen ----
 document.addEventListener('DOMContentLoaded', function() {
+  lastEgneHoteller();   // Last egendefinerte hoteller før resten initialiseres
   initNavigation();
   initSteder();
   initInfo();
@@ -474,6 +499,172 @@ function initKartFilter() {
   });
 }
 
+// =====================================================================
+// LEGG TIL EGET HOTELL — søk via OpenStreetMap Nominatim
+// =====================================================================
+
+let _søkResultater = [];
+let _søktHotellData = null;
+
+function åpneLeggtilHotell() {
+  const overlay = document.getElementById('modal-overlay');
+  document.getElementById('modal-title').textContent = '🏨 Legg til eget hotell';
+  document.getElementById('modal-subtitle').textContent = 'Søk opp hotellet for å finne plassering på kartet';
+  document.getElementById('modal-body').innerHTML = `
+    <div class="eget-hotell-form">
+      <div class="field-label">Hotellnavn *</div>
+      <input type="text" id="eh-navn" class="field-input"
+             placeholder="f.eks. Stalheim Hotel" oninput="oppdaterEhLagreBtn()">
+
+      <div class="field-label">By / sted</div>
+      <input type="text" id="eh-sted" class="field-input"
+             placeholder="f.eks. Voss, Norge" oninput="oppdaterEhLagreBtn()">
+
+      <button class="btn btn-fjord" style="width:100%;margin-top:8px" onclick="søkHotellKoordinater()">
+        🔍 Finn på kart (OpenStreetMap)
+      </button>
+
+      <div id="eh-resultat" style="margin-top:10px"></div>
+
+      <div class="field-label" style="margin-top:14px">Booking.com-lenke (valgfritt)</div>
+      <input type="url" id="eh-bookingurl" class="field-input"
+             placeholder="https://www.booking.com/hotel/no/hotell-navn.html">
+      <p style="font-size:11px;color:#5a6b7c;margin-top:3px">
+        Lim inn URL fra Booking.com — appen bytter inn riktige datoer og 2 voksne automatisk
+      </p>
+
+      <button class="btn btn-primary" style="width:100%;margin-top:16px"
+              id="eh-lagre-btn" disabled onclick="lagreEgetHotell()">
+        ✓ Legg til i appen
+      </button>
+    </div>`;
+  _søktHotellData = null;
+  overlay.classList.add('open');
+}
+
+function oppdaterEhLagreBtn() {
+  const btn = document.getElementById('eh-lagre-btn');
+  if (btn) btn.disabled = !_søktHotellData;
+}
+
+async function søkHotellKoordinater() {
+  const navn = (document.getElementById('eh-navn').value || '').trim();
+  const sted = (document.getElementById('eh-sted').value || '').trim();
+  const resultatDiv = document.getElementById('eh-resultat');
+
+  if (!navn) { visToast('Skriv inn hotellnavn først'); return; }
+
+  resultatDiv.innerHTML = '<p style="color:#5a6b7c;font-size:13px">⏳ Søker…</p>';
+  _søktHotellData = null;
+  document.getElementById('eh-lagre-btn').disabled = true;
+
+  try {
+    const q = encodeURIComponent(navn + (sted ? ', ' + sted : '') + ', Norway');
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${q}&limit=4&accept-language=no`,
+      { headers: { 'User-Agent': 'HardangerSogn-ReiseApp/1.0' } }
+    );
+    const data = await res.json();
+    _søkResultater = data;
+
+    if (!data.length) {
+      resultatDiv.innerHTML = '<p style="color:#c0392b;font-size:13px">❌ Fant ingen steder. Prøv med mer spesifikt stedsnavn.</p>';
+      return;
+    }
+
+    const listeHtml = data.slice(0, 4).map((r, i) => {
+      const deler = r.display_name.split(',');
+      const tittel = deler[0];
+      const under  = deler.slice(1, 3).join(',').trim();
+      return `
+        <button class="dag-velger-btn" id="eh-res-${i}" onclick="velgGeoResultat(${i})" style="margin-bottom:4px">
+          <span class="dag-velger-nr" style="font-size:16px;background:#2d8c6f">📍</span>
+          <span class="dag-velger-info">
+            <span class="dag-velger-dato">${tittel}</span>
+            <span class="dag-velger-sted">${under}</span>
+          </span>
+        </button>`;
+    }).join('');
+
+    resultatDiv.innerHTML = '<div class="field-label">Velg riktig sted:</div>' + listeHtml;
+  } catch(e) {
+    resultatDiv.innerHTML = '<p style="color:#c0392b;font-size:13px">❌ Nettverksfeil. Sjekk internettforbindelsen.</p>';
+  }
+}
+
+function velgGeoResultat(index) {
+  const r = _søkResultater[index];
+  _søktHotellData = {
+    lat: parseFloat(r.lat),
+    lng: parseFloat(r.lon),
+    displayNavn: r.display_name.split(',').slice(0, 2).join(',').trim()
+  };
+
+  // Highlight selected
+  for (let i = 0; i < 4; i++) {
+    const btn = document.getElementById(`eh-res-${i}`);
+    if (btn) btn.classList.toggle('valgt', i === index);
+  }
+
+  // Show confirmation
+  const bekreft = document.getElementById('eh-bekreft');
+  if (bekreft) bekreft.remove();
+  const p = document.createElement('p');
+  p.id = 'eh-bekreft';
+  p.style.cssText = 'font-size:12px;color:#2d8c6f;margin-top:6px;font-weight:600';
+  p.textContent = `✓ Valgt: ${_søktHotellData.displayNavn} (${_søktHotellData.lat.toFixed(4)}°N, ${_søktHotellData.lng.toFixed(4)}°Ø)`;
+  document.getElementById('eh-resultat').appendChild(p);
+
+  document.getElementById('eh-lagre-btn').disabled = false;
+}
+
+function lagreEgetHotell() {
+  if (!_søktHotellData) { visToast('Søk opp og velg et sted først'); return; }
+
+  const navn       = (document.getElementById('eh-navn').value || '').trim();
+  const stedInput  = (document.getElementById('eh-sted').value || '').trim();
+  const bookingUrl = (document.getElementById('eh-bookingurl').value || '').trim();
+
+  if (!navn) { visToast('Skriv inn hotellnavn'); return; }
+
+  // Parse Booking.com slug fra URL
+  let bookingSlug = null;
+  if (bookingUrl.includes('booking.com/hotel/')) {
+    const m = bookingUrl.match(/booking\.com\/hotel\/[a-z]{2}\/([^.?/#]+)/);
+    if (m) bookingSlug = m[1];
+  }
+
+  const id = 'egendefinert-' + Date.now();
+  const nyttHotell = {
+    id,
+    navn,
+    sted:         stedInput || _søktHotellData.displayNavn.split(',')[0].trim(),
+    region:       'Eget hotell',
+    lat:          _søktHotellData.lat,
+    lng:          _søktHotellData.lng,
+    stjerner:     0,
+    prisklasse:   '',
+    beskrivelse:  'Egendefinert hotell. Rediger notater i dagsplanen.',
+    fasiliteter:  [],
+    bookingSlug,
+    bookingUrl:   bookingUrl || null,
+    egendefinert: true
+  };
+
+  egneHoteller.push(nyttHotell);
+  lagreEgneHoteller();
+  HOTELLER.push(nyttHotell);   // Legg til i global liste
+
+  // Vis på kart
+  if (typeof leggTilHotellMarkør === 'function') leggTilHotellMarkør(nyttHotell);
+
+  // Oppdater Steder-tab
+  renderSteder(aktiveStederFilter);
+
+  lukkModal();
+  visToast('🏨 ' + navn + ' lagt til!');
+}
+
 // Eksporter til globalt scope for HTML onclick-hendelser
 window.bytteTab = bytteTab;
 window.toggleDagCard = toggleDagCard;
@@ -491,3 +682,10 @@ window.flyToLocation = flyToLocation;
 window.visHotellPaKart = visHotellPaKart;
 window.visStedModal = visStedModal;
 window.lukkModal = lukkModal;
+window.åpneLeggtilHotell = åpneLeggtilHotell;
+window.søkHotellKoordinater = søkHotellKoordinater;
+window.velgGeoResultat = velgGeoResultat;
+window.lagreEgetHotell = lagreEgetHotell;
+window.oppdaterEhLagreBtn = oppdaterEhLagreBtn;
+window.velgDagForHotell = velgDagForHotell;
+window.velgDagForTur = velgDagForTur;

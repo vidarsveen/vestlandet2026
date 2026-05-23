@@ -93,7 +93,9 @@ function lagHotellPopup(h) {
   const idag = APP_CONFIG.startDate;
   const bookUrl = h.bookingSlug
     ? lagHotellBookingUrl(h.bookingSlug, idag, datoForDag(1))
-    : lagBookingUrl(h.navn, h.sted, idag, datoForDag(1));
+    : h.bookingUrl
+      ? h.bookingUrl
+      : lagBookingUrl(h.navn, h.sted, idag, datoForDag(1));
   const stjernerHtml = h.stjerner ? '⭐'.repeat(h.stjerner) : '';
 
   return `
@@ -255,6 +257,15 @@ function toggleMapFilter(type) {
     const t = chip.dataset.filter;
     chip.classList.toggle('active', activeFilters.has(t));
   });
+}
+
+// ---- Legg til ett enkelt hotell på kartet (egendefinert) ----
+function leggTilHotellMarkør(h) {
+  if (!map || !layers.hoteller) return;
+  const ikon = lagMarkørIkon(COLORS.hotell, '🏨');
+  const marker = L.marker([h.lat, h.lng], { icon: ikon });
+  marker.bindPopup(lagHotellPopup(h), { maxWidth: 240 });
+  layers.hoteller.addLayer(marker);
 }
 
 // ---- Flytt kart til lokasjon ----
