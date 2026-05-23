@@ -2,7 +2,7 @@
 // planner.js — Dagplanlegger med localStorage
 // =====================================================================
 
-const STORAGE_KEY = 'hardanger-sogn-plan-v2';
+const STORAGE_KEY = 'hardanger-sogn-plan-v3';
 let currentPlan = [];
 let visReiseModus = false;
 
