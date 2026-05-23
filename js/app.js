@@ -52,9 +52,12 @@ function bytteTab(tabNavn) {
       mapInitialized = true;
       setTimeout(() => {
         initMap();
+        // Vis reiserute automatisk etter at kart er initialisert
+        setTimeout(() => oppdaterReiserute(), 300);
       }, 50);
     } else {
       oppdaterKart();
+      oppdaterReiserute();
     }
   }
 }
@@ -391,6 +394,66 @@ function visStedModal(type, id) {
 function lukkModal() {
   const overlay = document.getElementById('modal-overlay');
   if (overlay) overlay.classList.remove('open');
+}
+
+// ---- Legg hotell til plan (dag-velger fra kart) ----
+function velgDagForHotell(hotelId) {
+  const h = HOTELLER.find(x => x.id === hotelId);
+  if (!h || typeof currentPlan === 'undefined') return;
+
+  const overlay = document.getElementById('modal-overlay');
+  const title   = document.getElementById('modal-title');
+  const sub     = document.getElementById('modal-subtitle');
+  const body    = document.getElementById('modal-body');
+
+  title.textContent = '📅 Legg til i plan';
+  sub.textContent   = h.navn + ' · ' + h.sted;
+
+  const dagerHtml = currentPlan.map((dag, i) => {
+    const erValgt = dag.hotell === hotelId;
+    return `
+      <button class="dag-velger-btn ${erValgt ? 'valgt' : ''}"
+              onclick="oppdaterHotell(${i},'${hotelId}');lukkModal();visToast('${h.navn} lagt til dag ${dag.dag} ✓')">
+        <span class="dag-velger-nr">${dag.dag}</span>
+        <span class="dag-velger-info">
+          <span class="dag-velger-dato">${dag.dagNavn}</span>
+          <span class="dag-velger-sted">${dag.sted}${erValgt ? ' · ✓ Allerede valgt' : ''}</span>
+        </span>
+      </button>`;
+  }).join('');
+
+  body.innerHTML = `<div class="dag-velger-liste">${dagerHtml}</div>`;
+  overlay.classList.add('open');
+}
+
+// ---- Legg tur til plan (dag-velger fra kart) ----
+function velgDagForTur(turId) {
+  const tur = TURER.find(t => t.id === turId);
+  if (!tur || typeof currentPlan === 'undefined') return;
+
+  const overlay = document.getElementById('modal-overlay');
+  const title   = document.getElementById('modal-title');
+  const sub     = document.getElementById('modal-subtitle');
+  const body    = document.getElementById('modal-body');
+
+  title.textContent = '🥾 Legg til i plan';
+  sub.textContent   = tur.navn + ' · ' + tur.varighet + ' · ' + tur.distanse;
+
+  const dagerHtml = currentPlan.map((dag, i) => {
+    const erValgt = (dag.aktiviteter || []).includes(turId);
+    return `
+      <button class="dag-velger-btn ${erValgt ? 'valgt' : ''}"
+              onclick="toggleAktivitet(${i},'${turId}',this);this.closest('.dag-velger-liste').querySelectorAll('.dag-velger-btn').forEach(b=>b.classList.remove('valgt'));this.classList.toggle('valgt',${JSON.stringify(!erValgt)});visToast('${tur.navn} ${erValgt ? 'fjernet fra' : 'lagt til'} dag ${dag.dag} ✓');oppdaterReiserute()">
+        <span class="dag-velger-nr">${dag.dag}</span>
+        <span class="dag-velger-info">
+          <span class="dag-velger-dato">${dag.dagNavn}</span>
+          <span class="dag-velger-sted">${dag.sted}${erValgt ? ' · ✓ Lagt til' : ''}</span>
+        </span>
+      </button>`;
+  }).join('');
+
+  body.innerHTML = `<div class="dag-velger-liste">${dagerHtml}</div>`;
+  overlay.classList.add('open');
 }
 
 // ---- Toast-varsel ----

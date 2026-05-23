@@ -13,7 +13,7 @@ let layers = {
 
 let activeFilters = new Set(['hoteller', 'hytter', 'turer', 'severdigheter']);
 let reiseruteLag  = null;
-let reiseruteAktiv = false;
+let reiseruteAktiv = true;   // vises automatisk
 
 // ---- Marker-farger ----
 const COLORS = {
@@ -102,10 +102,13 @@ function lagHotellPopup(h) {
       <div class="map-popup-name">${h.navn}</div>
       <div class="map-popup-desc">${h.beskrivelse.substring(0, 100)}${h.beskrivelse.length > 100 ? '…' : ''}</div>
       <div class="map-popup-meta">${stjernerHtml} · ${h.sted}</div>
-      <div style="display:flex;gap:6px;margin-top:6px">
+      <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
         <a class="btn btn-primary btn-sm" href="${bookUrl}" target="_blank" rel="noopener">
           📅 Book nå
         </a>
+        <button class="btn btn-fjord btn-sm" onclick="velgDagForHotell('${h.id}')">
+          ＋ Legg i plan
+        </button>
         <button class="btn btn-outline btn-sm" onclick="visStedModal('hotell','${h.id}')">
           ℹ Info
         </button>
@@ -200,9 +203,12 @@ function lagTurPopup(tur) {
         ⏱ ${tur.varighet} &nbsp;·&nbsp; 📏 ${tur.distanse} &nbsp;·&nbsp; ⬆ ${tur.stigning}
       </div>
       <span class="tag ${vanskCss}" style="margin-bottom:8px;display:inline-block">${tur.vanskelighetsgrad}</span>
-      <div style="margin-top:4px">
+      <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
+        <button class="btn btn-fjord btn-sm" onclick="velgDagForTur('${tur.id}')">
+          ＋ Legg i plan
+        </button>
         <a class="btn btn-gull btn-sm" href="${tur.utNoUrl}" target="_blank" rel="noopener">
-          🗺 Se på UT.no
+          🗺 UT.no
         </a>
       </div>
     </div>`;
@@ -337,14 +343,55 @@ function visReiserute() {
       .addTo(reiseruteLag);
   });
 
+  // Fremhev planlagte turer med tykk gull-linje
+  const alleBounds = stopp.map(s => [s.lat, s.lng]);
+  currentPlan.forEach(dag => {
+    (dag.aktiviteter || []).forEach(turId => {
+      const tur = TURER.find(t => t.id === turId);
+      if (!tur || !tur.koordinater) return;
+
+      // Tykk fremhevet polyline for planlagt tur
+      L.polyline(tur.koordinater, {
+        color: '#e8a020',
+        weight: 7,
+        opacity: 0.9,
+        lineCap: 'round',
+        lineJoin: 'round'
+      }).bindPopup(`
+        <div class="map-popup">
+          <div class="map-popup-type">🥾 Dag ${dag.dag} · Planlagt tur</div>
+          <div class="map-popup-name">${tur.navn}</div>
+          <div class="map-popup-desc">⏱ ${tur.varighet} · 📏 ${tur.distanse} · ⬆ ${tur.stigning}</div>
+        </div>`, { maxWidth: 220 })
+        .addTo(reiseruteLag);
+
+      // Start-markør for turen
+      const turIkon = L.divIcon({
+        className: '',
+        html: `<div class="reise-nr-markør" style="background:#e8a020;font-size:11px">🥾</div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14]
+      });
+      L.marker(tur.koordinater[0], { icon: turIkon, zIndexOffset: 900 })
+        .bindPopup(`
+          <div class="map-popup">
+            <div class="map-popup-type">🥾 Dag ${dag.dag}</div>
+            <div class="map-popup-name">${tur.navn}</div>
+          </div>`)
+        .addTo(reiseruteLag);
+
+      // Legg til turens koordinater i bounds
+      tur.koordinater.forEach(k => alleBounds.push(k));
+    });
+  });
+
   reiseruteLag.addTo(map);
 
-  // Zoom til ruten
-  const bounds = stopp.map(s => [s.lat, s.lng]);
-  if (bounds.length === 1) {
-    map.setView(bounds[0], 12);
-  } else {
-    map.fitBounds(bounds, { padding: [50, 50] });
+  // Zoom til alt i ruten
+  if (alleBounds.length === 1) {
+    map.setView(alleBounds[0], 12);
+  } else if (alleBounds.length > 1) {
+    map.fitBounds(alleBounds, { padding: [50, 50] });
   }
 }
 
