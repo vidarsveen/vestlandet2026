@@ -451,6 +451,32 @@ const TURER = [
     farge: '#e8a020'
   },
   {
+    id: 'molden',
+    navn: 'Molden',
+    undertittel: 'Utsikt over Lustrafjorden fra Solvorn',
+    region: 'Luster & Jostedalsbreen',
+    vanskelighetsgrad: 'Middels',
+    varighet: '4 timer',
+    distanse: '8 km',
+    stigning: '610 m',
+    beskrivelse: 'En av Norges vakreste utsiktsturer! Fra Solvorn klatrer du opp til Molden (610 moh) med panoramautsikt over den innerste delen av Sognefjorden. Spektakulær 360°-utsikt over Lustrafjorden, Urnes og Jostedalsbreen.',
+    startLat: 61.3730,
+    startLng: 7.2810,
+    utNoUrl: 'https://www.ut.no/kart/#14/61.374/7.278',
+    merInfo: 'Start fra Solvorn sentrum (fergeleie). Bratt og krevende oppstigning – godt fottøy nødvendig. Retur samme vei eller via Ornes med ferge tilbake.',
+    koordinater: [
+      [61.3730, 7.2810],
+      [61.3752, 7.2778],
+      [61.3773, 7.2745],
+      [61.3795, 7.2710],
+      [61.3818, 7.2680],
+      [61.3840, 7.2648],
+      [61.3858, 7.2620]
+    ],
+    farge: '#e8a020',
+    anbefalt: true
+  },
+  {
     id: 'naeroy',
     navn: 'Nærøydalen',
     undertittel: 'UNESCO-fjord, Gudvangen',

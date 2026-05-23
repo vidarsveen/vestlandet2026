@@ -61,6 +61,7 @@ function bytteTab(tabNavn) {
 
 // ---- Steder-tab ----
 let aktiveStederFilter = 'alle';
+let søkeTekst = '';
 
 function initSteder() {
   renderSteder('alle');
@@ -74,23 +75,92 @@ function filterSteder(type) {
   renderSteder(type);
 }
 
+// ---- Søk ----
+function oppdaterSøk(verdi) {
+  søkeTekst = verdi.trim().toLowerCase();
+  const clearBtn = document.getElementById('search-clear');
+  if (clearBtn) clearBtn.style.display = søkeTekst ? 'block' : 'none';
+  renderSteder(aktiveStederFilter);
+}
+
+function tømmeSøk() {
+  søkeTekst = '';
+  const input = document.getElementById('steder-search');
+  if (input) input.value = '';
+  const clearBtn = document.getElementById('search-clear');
+  if (clearBtn) clearBtn.style.display = 'none';
+  renderSteder(aktiveStederFilter);
+}
+
+function matcherSøk(item) {
+  if (!søkeTekst) return true;
+  const tekst = [
+    item.navn        || '',
+    item.sted        || '',
+    item.beskrivelse || '',
+    item.region      || '',
+    item.undertittel || '',
+    item.type        || '',
+    item.merInfo     || '',
+    item.vanskelighetsgrad || '',
+    ...(item.fasiliteter   || [])
+  ].join(' ').toLowerCase();
+  // Støtter flere søkeord separert med mellomrom (AND-logikk)
+  return søkeTekst.split(/\s+/).every(ord => tekst.includes(ord));
+}
+
+function oppdaterSøkAntall(antall, totalt) {
+  const el = document.getElementById('søk-antall');
+  if (!el) return;
+  if (!søkeTekst) {
+    el.textContent = '';
+    return;
+  }
+  if (antall === 0) {
+    el.innerHTML = `<span style="color:#c04040">Ingen treff på «${søkeTekst}»</span>`;
+  } else {
+    el.textContent = `${antall} av ${totalt} treff`;
+  }
+}
+
 function renderSteder(filter) {
   const container = document.getElementById('steder-liste');
   if (!container) return;
   container.innerHTML = '';
 
-  if (filter === 'alle' || filter === 'hoteller') {
-    HOTELLER.forEach(h => container.appendChild(lagHotellCard(h)));
+  let alle = [];
+  let totalt = 0;
+
+  const visBtyper = {
+    hoteller:      filter === 'alle' || filter === 'hoteller',
+    hytter:        filter === 'alle' || filter === 'hytter',
+    turer:         filter === 'alle' || filter === 'turer',
+    severdigheter: filter === 'alle' || filter === 'severdigheter'
+  };
+
+  if (visBtyper.hoteller)      HOTELLER.forEach(h => { totalt++; if (matcherSøk(h)) alle.push({ type: 'hotell',      data: h }); });
+  if (visBtyper.hytter)        HYTTER.forEach(h =>   { totalt++; if (matcherSøk(h)) alle.push({ type: 'hytte',       data: h }); });
+  if (visBtyper.turer)         TURER.forEach(t =>    { totalt++; if (matcherSøk(t)) alle.push({ type: 'tur',         data: t }); });
+  if (visBtyper.severdigheter) SEVERDIGHETER.forEach(s => { totalt++; if (matcherSøk(s)) alle.push({ type: 'severdighet', data: s }); });
+
+  oppdaterSøkAntall(alle.length, totalt);
+
+  if (alle.length === 0) {
+    container.innerHTML = `
+      <div class="ingen-treff">
+        <div class="ingen-ikon">🔍</div>
+        <p>Ingen treff på <strong>«${søkeTekst}»</strong></p>
+        <small>Prøv et annet søkeord, eller fjern filteret</small>
+      </div>`;
+    return;
   }
-  if (filter === 'alle' || filter === 'hytter') {
-    HYTTER.forEach(h => container.appendChild(lagHytteCard(h)));
-  }
-  if (filter === 'alle' || filter === 'turer') {
-    TURER.forEach(t => container.appendChild(lagTurCard(t)));
-  }
-  if (filter === 'alle' || filter === 'severdigheter') {
-    SEVERDIGHETER.forEach(s => container.appendChild(lagSeverdCard(s)));
-  }
+
+  alle.forEach(({ type, data }) => {
+    if (type === 'hotell')      container.appendChild(lagHotellCard(data));
+    else if (type === 'hytte')  container.appendChild(lagHytteCard(data));
+    else if (type === 'tur')    container.appendChild(lagTurCard(data));
+    else                        container.appendChild(lagSeverdCard(data));
+  });
 }
 
 function lagHotellCard(h) {
@@ -348,6 +418,8 @@ window.visIDagPaKart = visIDagPaKart;
 window.eksporterPlan = eksporterPlan;
 window.nullstillPlan = nullstillPlan;
 window.filterSteder = filterSteder;
+window.oppdaterSøk  = oppdaterSøk;
+window.tømmeSøk     = tømmeSøk;
 window.toggleMapFilter = toggleMapFilter;
 window.flyToLocation = flyToLocation;
 window.visHotellPaKart = visHotellPaKart;

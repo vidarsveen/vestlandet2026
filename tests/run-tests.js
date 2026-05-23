@@ -48,9 +48,9 @@ t('SEVERDIGHETER count', function() {
   if (!Array.isArray(SEVERDIGHETER) || SEVERDIGHETER.length < 5) throw new Error('Fant ' + (SEVERDIGHETER ? SEVERDIGHETER.length : 'undefined'));
   return SEVERDIGHETER.length + ' severdigheter';
 });
-t('STANDARD_PLAN 8 dager', function() {
-  if (!Array.isArray(STANDARD_PLAN) || STANDARD_PLAN.length !== 8) throw new Error('Fant ' + (STANDARD_PLAN ? STANDARD_PLAN.length : 'undefined') + ' dager');
-  return STANDARD_PLAN.length + ' dager';
+t('STANDARD_PLAN 9 dager (inkl. bryllupsdag)', function() {
+  if (!Array.isArray(STANDARD_PLAN) || STANDARD_PLAN.length !== 9) throw new Error('Fant ' + (STANDARD_PLAN ? STANDARD_PLAN.length : 'undefined') + ' dager, forventet 9');
+  return STANDARD_PLAN.length + ' dager (12.–20. juni)';
 });
 t('Brakanes er starthotell', function() {
   var b = HOTELLER.find(function(h) { return h.id === 'brakanes'; });
@@ -127,8 +127,8 @@ t('Turistforeningen i LENKER', function() {
 
 // === DATOER ===
 console.log('\n=== DATOER ===');
-t('Startdato 2026-06-13', function() {
-  if (APP_CONFIG.startDate !== '2026-06-13') throw new Error('Er: ' + APP_CONFIG.startDate);
+t('Startdato 2026-06-12 (bryllupsdag)', function() {
+  if (APP_CONFIG.startDate !== '2026-06-12') throw new Error('Er: ' + APP_CONFIG.startDate);
   return APP_CONFIG.startDate;
 });
 t('Sluttdato 2026-06-20', function() {
@@ -139,13 +139,13 @@ t('2 personer i config', function() {
   if (APP_CONFIG.people !== 2) throw new Error('Er: ' + APP_CONFIG.people);
   return '2 voksne';
 });
-t('datoForDag(0) = 2026-06-13', function() {
+t('datoForDag(0) = 2026-06-12', function() {
   var d = datoForDag(0);
-  if (d !== '2026-06-13') throw new Error('Returnerte: ' + d);
+  if (d !== '2026-06-12') throw new Error('Returnerte: ' + d);
   return d;
 });
-t('datoForDag(7) = 2026-06-20', function() {
-  var d = datoForDag(7);
+t('datoForDag(8) = 2026-06-20', function() {
+  var d = datoForDag(8);
   if (d !== '2026-06-20') throw new Error('Returnerte: ' + d);
   return d;
 });
