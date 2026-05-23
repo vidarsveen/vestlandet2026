@@ -12,6 +12,8 @@ let layers = {
 };
 
 let activeFilters = new Set(['hoteller', 'hytter', 'turer', 'severdigheter']);
+let reiseruteLag  = null;
+let reiseruteAktiv = false;
 
 // ---- Marker-farger ----
 const COLORS = {
@@ -89,7 +91,9 @@ function leggTilHoteller() {
 
 function lagHotellPopup(h) {
   const idag = APP_CONFIG.startDate;
-  const bookUrl = lagBookingUrl(h.navn, h.sted, idag, datoForDag(1));
+  const bookUrl = h.bookingSlug
+    ? lagHotellBookingUrl(h.bookingSlug, idag, datoForDag(1))
+    : lagBookingUrl(h.navn, h.sted, idag, datoForDag(1));
   const stjernerHtml = h.stjerner ? '⭐'.repeat(h.stjerner) : '';
 
   return `
@@ -258,4 +262,100 @@ function oppdaterKart() {
   if (map) {
     setTimeout(() => map.invalidateSize(), 100);
   }
+}
+
+// ---- Reiserute — viser planlagte stopp og linjer på kartet ----
+function toggleReiserute() {
+  reiseruteAktiv = !reiseruteAktiv;
+  const chip = document.querySelector('.filter-chip[data-filter="reiserute"]');
+  if (chip) chip.classList.toggle('active', reiseruteAktiv);
+
+  if (reiseruteAktiv) {
+    visReiserute();
+  } else {
+    skjulReiserute();
+  }
+}
+
+function visReiserute() {
+  skjulReiserute();
+  if (!map || typeof currentPlan === 'undefined') return;
+
+  reiseruteLag = L.layerGroup();
+
+  // Samle alle bookte stopp i rekkefølge
+  const stopp = currentPlan.map(dag => {
+    const hotell = dag.hotell ? HOTELLER.find(h => h.id === dag.hotell) : null;
+    const hyt    = dag.hotell ? HYTTER.find(h => h.id === dag.hotell)   : null;
+    const lok    = hotell || hyt;
+    return lok
+      ? { dag: dag.dag, lat: lok.lat, lng: lok.lng, navn: lok.navn, dagNavn: dag.dagNavn }
+      : null;
+  }).filter(Boolean);
+
+  if (stopp.length === 0) {
+    visToast('Ingen overnattingssteder i planen ennå 📅');
+    reiseruteAktiv = false;
+    const chip = document.querySelector('.filter-chip[data-filter="reiserute"]');
+    if (chip) chip.classList.remove('active');
+    return;
+  }
+
+  // Tegn stiplede linjer mellom påfølgende bookte dager
+  for (let i = 0; i < stopp.length - 1; i++) {
+    const fra = stopp[i];
+    const til = stopp[i + 1];
+    // Bare tegn linje hvis dagene er etterfølgende i planen
+    if (til.dag === fra.dag + 1) {
+      L.polyline([[fra.lat, fra.lng], [til.lat, til.lng]], {
+        color: '#e8a020',
+        weight: 3,
+        opacity: 0.9,
+        dashArray: '10 7',
+        lineCap: 'round'
+      }).addTo(reiseruteLag);
+    }
+  }
+
+  // Legg til nummererte stopp-markører
+  stopp.forEach(s => {
+    const ikonHtml = `<div class="reise-nr-markør">${s.dag}</div>`;
+    const ikon = L.divIcon({
+      className: '',
+      html: ikonHtml,
+      iconSize:   [30, 30],
+      iconAnchor: [15, 15],
+      popupAnchor:[0, -18]
+    });
+    L.marker([s.lat, s.lng], { icon: ikon, zIndexOffset: 1000 })
+      .bindPopup(`
+        <div class="map-popup">
+          <div class="map-popup-type">📅 Dag ${s.dag}</div>
+          <div class="map-popup-name">${s.navn}</div>
+          <div class="map-popup-desc">${s.dagNavn}</div>
+        </div>`, { maxWidth: 200 })
+      .addTo(reiseruteLag);
+  });
+
+  reiseruteLag.addTo(map);
+
+  // Zoom til ruten
+  const bounds = stopp.map(s => [s.lat, s.lng]);
+  if (bounds.length === 1) {
+    map.setView(bounds[0], 12);
+  } else {
+    map.fitBounds(bounds, { padding: [50, 50] });
+  }
+}
+
+function skjulReiserute() {
+  if (reiseruteLag) {
+    map.removeLayer(reiseruteLag);
+    reiseruteLag = null;
+  }
+}
+
+// Kalles fra planner når plan endres, slik at reiseruten oppdateres
+function oppdaterReiserute() {
+  if (reiseruteAktiv) visReiserute();
 }

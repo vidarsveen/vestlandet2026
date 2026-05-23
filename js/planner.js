@@ -283,6 +283,7 @@ function oppdaterHotell(index, hotelId) {
   }
 
   visToast('Overnatting oppdatert ✓');
+  if (typeof oppdaterReiserute === 'function') oppdaterReiserute();
 }
 
 // ---- Toggle aktivitet ----
