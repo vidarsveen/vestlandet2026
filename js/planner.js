@@ -100,6 +100,11 @@ function lagReiseoversikt() {
     // Bryllups-pill for dag 1
     const ekstraPills = (dag.dag === 1) ? '<span class="akt-pill">💒 Bryllup</span>' : '';
 
+    // Bruk hotellets faktiske by, ikke det generiske regionhintet
+    const visStedTekst = erBooket
+      ? (hotell ? hotell.sted : hyt.sted) + ' · 🏨 ' + stedNavn
+      : dag.sted + ' · Ledig';
+
     const stopp = document.createElement('div');
     stopp.className = `reise-stopp ${erBooket ? 'booked' : 'ledig'}`;
     stopp.id = `stopp-${i}`;
@@ -107,7 +112,7 @@ function lagReiseoversikt() {
       <div class="stopp-sirkel">${dag.dag}</div>
       <div class="stopp-innhold">
         <div class="stopp-dato">${dag.dagNavn}</div>
-        <div class="stopp-sted">${dag.sted}${stedNavn ? ' · 🏨 ' + stedNavn : ''}</div>
+        <div class="stopp-sted">${visStedTekst}</div>
         ${(aktPills || ekstraPills) ? `<div class="stopp-aktiviteter">${ekstraPills}${aktPills}</div>` : ''}
       </div>`;
 
@@ -140,27 +145,33 @@ function lagReiseoversikt() {
   return wrapper;
 }
 
+// ---- Hjelpefunksjon: dynamisk tittel og sted basert på booking ----
+function dagVisning(dag) {
+  const hotell = dag.hotell ? HOTELLER.find(h => h.id === dag.hotell) : null;
+  const hyt    = dag.hotell ? HYTTER.find(h => h.id === dag.hotell)   : null;
+  const lok    = hotell || hyt;
+  return {
+    lokasjon: lok,
+    tittel: lok ? `🏨 ${lok.navn}` : dag.tittel,
+    sted:   lok ? lok.sted         : dag.sted
+  };
+}
+
 // ---- Lag et dagkort ----
 function lagDagCard(dag, index) {
   const div = document.createElement('div');
   div.className = 'dag-card';
   div.id = `dag-card-${index}`;
 
-  // Finn hotell-info
-  const hotell = dag.hotell ? HOTELLER.find(h => h.id === dag.hotell) : null;
-  const hotellNavn = hotell ? hotell.navn : (dag.hotell ? dag.hotell : 'Ikke valgt');
-
-  // Ikon basert på dag
-  const dagIkoner = ['🛬', '🥾', '🏔', '🚂', '⛵', '🏰', '🌅', '🏠'];
-  const ikon = dagIkoner[index] || '📍';
+  const { tittel, sted } = dagVisning(dag);
 
   div.innerHTML = `
     <div class="dag-card-header" onclick="toggleDagCard(${index})">
       <div class="dag-nummer">${dag.dag}</div>
       <div class="dag-info">
         <div class="dag-dato">${dag.dagNavn}</div>
-        <div class="dag-tittel">${dag.tittel}</div>
-        <div class="dag-sted">📍 ${dag.sted} ${hotell ? '· 🏨 ' + hotell.navn : (dag.hotell ? '' : '')}</div>
+        <div class="dag-tittel">${tittel}</div>
+        <div class="dag-sted">📍 ${sted}</div>
       </div>
       <div class="dag-expand-icon">⌄</div>
     </div>
@@ -267,21 +278,20 @@ function oppdaterHotell(index, hotelId) {
   lagrePlan();
 
   if (visReiseModus) {
-    // I "Vis reise"-modus: tegn om hele tidslinja slik at endringen vises
     renderPlan();
   } else {
-    // I redigeringsmodus: oppdater bare dette kortets innhold
+    // Oppdater kortets innhold (booking-knapper etc.)
     const body = document.getElementById(`dag-body-${index}`);
-    if (body) {
-      body.innerHTML = lagDagCardBody(currentPlan[index], index);
-    }
+    if (body) body.innerHTML = lagDagCardBody(currentPlan[index], index);
+
+    // Oppdater kortets header med riktig tittel og sted
     const card = document.getElementById(`dag-card-${index}`);
     if (card) {
-      const hotell = hotelId ? HOTELLER.find(h => h.id === hotelId) : null;
-      const stedEl = card.querySelector('.dag-sted');
-      if (stedEl) {
-        stedEl.textContent = `📍 ${currentPlan[index].sted}${hotell ? ' · 🏨 ' + hotell.navn : ''}`;
-      }
+      const { tittel, sted } = dagVisning(currentPlan[index]);
+      const tittelEl = card.querySelector('.dag-tittel');
+      const stedEl   = card.querySelector('.dag-sted');
+      if (tittelEl) tittelEl.textContent = tittel;
+      if (stedEl)   stedEl.textContent   = '📍 ' + sted;
     }
   }
 
