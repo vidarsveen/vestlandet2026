@@ -3,10 +3,10 @@
 // =====================================================================
 
 const APP_CONFIG = {
-  startDate: '2026-06-13',
+  startDate: '2026-06-12',
   endDate: '2026-06-20',
   people: 2,
-  tripDays: 8,
+  tripDays: 9,
   mapCenter: [60.65, 7.0],
   mapZoom: 9,
   currency: 'NOK'
@@ -22,8 +22,8 @@ function lagBookingUrl(hotelNavn, sted, innsjekk, utsjekk) {
 }
 
 function datoForDag(dagNr) {
-  // dagNr 0 = 13. juni, osv.
-  const d = new Date('2026-06-13');
+  // dagNr 0 = 12. juni (ankomst/bryllupsdag), osv.
+  const d = new Date('2026-06-12');
   d.setDate(d.getDate() + dagNr);
   return d.toISOString().split('T')[0];
 }
@@ -46,8 +46,10 @@ const HOTELLER = [
     fasiliteter: ['Restaurant', 'Bar', 'Gratis parkering', 'Fjordutsikt', 'Terrasse', 'WiFi'],
     telefon: '+47 56 52 61 05',
     web: 'https://www.brakanes-hotel.no',
+    wiki: 'https://no.wikipedia.org/wiki/Ulvik',
     bookingSearch: 'Brakanes Hotell Ulvik',
-    startHotell: true
+    startHotell: true,
+    bryllup: true
   },
   {
     id: 'ullensvang',
@@ -62,6 +64,7 @@ const HOTELLER = [
     fasiliteter: ['Restaurant', 'Spa', 'Pool', 'Tennisbane', 'Fjordutsikt', 'WiFi'],
     telefon: '+47 53 67 00 00',
     web: 'https://www.hotel-ullensvang.no',
+    wiki: 'https://no.wikipedia.org/wiki/Hotel_Ullensvang',
     bookingSearch: 'Ullensvang Hotel Lofthus Hardanger'
   },
   {
@@ -77,6 +80,7 @@ const HOTELLER = [
     fasiliteter: ['Restaurant', 'Bar', 'Parkering', 'Fjordnær', 'WiFi'],
     telefon: '+47 53 67 19 00',
     web: 'https://www.hardangerhotel.no',
+    wiki: 'https://no.wikipedia.org/wiki/Kinsarvik',
     bookingSearch: 'Hardanger Hotel Kinsarvik'
   },
   {
@@ -92,6 +96,7 @@ const HOTELLER = [
     fasiliteter: ['Restaurant', 'Historisk atmosfære', 'Fjordnær', 'WiFi'],
     telefon: '+47 53 66 64 00',
     web: 'https://www.utnehotel.no',
+    wiki: 'https://no.wikipedia.org/wiki/Utne_Hotel',
     bookingSearch: 'Utne Hotel Hardanger'
   },
   {
@@ -107,6 +112,7 @@ const HOTELLER = [
     fasiliteter: ['Restaurant', 'Bar', 'Spa', 'Pool', 'Parkering', 'WiFi'],
     telefon: '+47 53 66 52 64',
     web: 'https://www.nordicchoicehotels.no',
+    wiki: 'https://no.wikipedia.org/wiki/Eidfjord',
     bookingSearch: 'Quality Hotel Eidfjord Norway'
   },
   {
@@ -122,6 +128,7 @@ const HOTELLER = [
     fasiliteter: ['Restaurant', 'Bar', 'Spa', 'Fjordnær', 'Sykkelparkering', 'WiFi'],
     telefon: '+47 57 63 63 00',
     web: 'https://www.fretheim-hotel.no',
+    wiki: 'https://no.wikipedia.org/wiki/Fl%C3%A5m',
     bookingSearch: 'Fretheim Hotel Flåm Norway'
   },
   {
@@ -137,6 +144,7 @@ const HOTELLER = [
     fasiliteter: ['Restaurant', 'Bryggeri', 'Bar', 'Fjordnær', 'WiFi'],
     telefon: '+47 57 63 20 50',
     web: 'https://www.flamsbrygga.no',
+    wiki: 'https://no.wikipedia.org/wiki/Fl%C3%A5m',
     bookingSearch: 'Flåmsbrygga Hotel Flåm'
   },
   {
@@ -152,6 +160,7 @@ const HOTELLER = [
     fasiliteter: ['Restaurant', 'Bar', 'Fjordutsikt', 'Historisk arkitektur', 'WiFi'],
     telefon: '+47 57 69 42 00',
     web: 'https://www.kviknes.no',
+    wiki: 'https://no.wikipedia.org/wiki/Kviknes_Hotel',
     bookingSearch: 'Kviknes Hotel Balestrand Sognefjord'
   },
   {
@@ -167,6 +176,7 @@ const HOTELLER = [
     fasiliteter: ['Restaurant', 'Bar', 'Treningssenter', 'Parkering', 'WiFi'],
     telefon: '+47 57 62 77 00',
     web: 'https://www.nordicchoicehotels.no',
+    wiki: 'https://no.wikipedia.org/wiki/Sogndal',
     bookingSearch: 'Quality Hotel Sogndal Norway'
   },
   {
@@ -182,6 +192,7 @@ const HOTELLER = [
     fasiliteter: ['Restaurant', 'Bar', 'Historisk beliggenhet', 'WiFi'],
     telefon: '+47 57 66 69 00',
     web: 'https://www.lindstromhotel.no',
+    wiki: 'https://no.wikipedia.org/wiki/L%C3%A6rdal',
     bookingSearch: 'Lindstrøm Hotel Lærdal Norway'
   }
 ];
@@ -202,7 +213,7 @@ const HYTTER = [
     hoyde: 1080,
     senger: 50,
     beskrivelse: 'Selvbetjent DNT-hytte på Hardangervidda, flott utgangspunkt for viddeturene. Tilgjengelig med DNT-nøkkel.',
-    bookingUrl: 'https://www.dnt.no/hytte/?id=rembesdalseter',
+    bookingUrl: 'https://hyttebestilling.dnt.no/hytte/10758',
     utNo: 'https://www.ut.no/kart/#14/60.517/7.333',
     sesong: 'Februar–oktober'
   },
@@ -217,7 +228,7 @@ const HYTTER = [
     hoyde: 1222,
     senger: 120,
     beskrivelse: 'Betjent DNT-hytte på Finse, Norges høyestliggende jernbanestasjon. Flott for tur til Hardangerjøkulen og Hardangervidda.',
-    bookingUrl: 'https://www.dnt.no/hytter/betjente/finse-1222/',
+    bookingUrl: 'https://hyttebestilling.dnt.no/hytte/10929',
     utNo: 'https://www.ut.no/kart/#13/60.593/7.507',
     sesong: 'Mars–oktober (betjent)'
   },
@@ -247,7 +258,7 @@ const HYTTER = [
     hoyde: 830,
     senger: 80,
     beskrivelse: 'Betjent DNT-hytte øverst i Aurlandsdalen. Startpunktet for den klassiske Aurlandsdalen-turen ned til Flåm.',
-    bookingUrl: 'https://www.dnt.no/hytter/betjente/osterboe/',
+    bookingUrl: 'https://hyttebestilling.dnt.no/hytte/101272',
     utNo: 'https://www.ut.no/kart/#14/60.888/7.168',
     sesong: 'Juni–september'
   }
@@ -282,19 +293,20 @@ const TURER = [
     distanse: '12 km',
     stigning: '700 m',
     beskrivelse: 'Norges vakreste fjordsti! Historisk sti langs åssiden over Sørfjorden, med panoramautsikt over frukttrær og blå fjordvann. Dronning Sonja har gått stien – derav navnet.',
-    startLat: 60.3517,
-    startLng: 6.6572,
-    utNoUrl: 'https://www.ut.no/tur/2.1952/',
-    merInfo: 'Start ved Lofthus kirke. Sti merket med røde T-er. Ta med vann og mat. Enkelt å ta ferge/buss tilbake.',
+    startLat: 60.3460,
+    startLng: 6.6110,
+    utNoUrl: 'https://ut.no/turforslag/117080/hm-dronning-sonjas-panoramatur-dronningstien',
+    merInfo: 'Start ved Opedal parkeringsplass sør for Lofthus. Sti merket med røde T-er opp åssiden. Ta med vann og mat. Enkelt å ta ferge/buss tilbake.',
     koordinater: [
-      [60.3520, 6.6572],
-      [60.3540, 6.6650],
-      [60.3565, 6.6740],
-      [60.3590, 6.6840],
-      [60.3620, 6.6950],
-      [60.3655, 6.7060],
-      [60.3690, 6.7160],
-      [60.3720, 6.7220],
+      [60.3460, 6.6110],
+      [60.3475, 6.6220],
+      [60.3490, 6.6340],
+      [60.3510, 6.6490],
+      [60.3535, 6.6630],
+      [60.3565, 6.6770],
+      [60.3605, 6.6920],
+      [60.3650, 6.7060],
+      [60.3695, 6.7180],
       [60.3745, 6.7280]
     ],
     farge: '#e8a020',
@@ -312,7 +324,7 @@ const TURER = [
     beskrivelse: 'En av Norges fineste dalturer! Fra fjell ned til fjord gjennom den dramatiske Aurlandsdalen. Fossefallshow og variert natur hele veien.',
     startLat: 60.8883,
     startLng: 7.1683,
-    utNoUrl: 'https://www.ut.no/tur/2.1906/',
+    utNoUrl: 'https://ut.no/turforslag/1114917/aurlandsdalen-historisk-vandrerute',
     merInfo: 'Ta buss til Østerbø fra Aurland eller Flåm. Turen ender ved Vassbygdi. Kan overnatte på Østerbø eller Vassbygdi-hytte.',
     koordinater: [
       [60.8883, 7.1683],
@@ -339,7 +351,7 @@ const TURER = [
     beskrivelse: 'Lett gåtur til det spektakulære Stegastein-utsiktspunktet, 650 m over Aurlandsfjorden. Ikonisk norsk arkitektur med glassutkikk.',
     startLat: 60.9233,
     startLng: 7.1417,
-    utNoUrl: 'https://www.ut.no/tur/stegastein',
+    utNoUrl: 'https://ut.no/turforslag/1112154683/stegastein',
     merInfo: 'Parkeringsareal rett ved veien opp fra Aurland. Enkel tur for alle. Supert for solnedgang.',
     koordinater: [
       [60.9195, 7.1350],
@@ -360,7 +372,7 @@ const TURER = [
     beskrivelse: 'Vøringsfossen faller 182 meter ned i Måbødalen og er en av Norges mest besøkte naturattraksjoner. Nytt utsiktspunkt fra 2023.',
     startLat: 60.4153,
     startLng: 7.2003,
-    utNoUrl: 'https://www.ut.no/tur/voringsfossen',
+    utNoUrl: 'https://ut.no/turforslag/115809/tur-inn-til-botnen-av-vringsfossen',
     merInfo: 'Parkering ved Fossli Hotel. Gode merkede stier ned til fossen og langs kanten. Nytt utsiktstårn fra 2023.',
     koordinater: [
       [60.4130, 7.1950],
@@ -382,7 +394,7 @@ const TURER = [
     beskrivelse: 'Flott tur opp Buerdalen til Buarbreen, en utløper av Folgefonna. Turens eneste "krevende" bit er den siste biten mot breen.',
     startLat: 60.0750,
     startLng: 6.5600,
-    utNoUrl: 'https://www.ut.no/tur/buerdalen',
+    utNoUrl: 'https://ut.no/turforslag/1114635/buarbreen-folgefonna-nasjonalpark',
     merInfo: 'Parkering i Buarbygda, Odda. Ikke gå på selve breen uten guide.',
     koordinater: [
       [60.0680, 6.5465],
@@ -405,7 +417,7 @@ const TURER = [
     beskrivelse: 'Gå gjennom det fascinerende Tokagjelet, et smalt juv med fosser og trapper hugget inn i fjellet. Unikt naturopplevelse!',
     startLat: 60.4000,
     startLng: 6.5500,
-    utNoUrl: 'https://www.ut.no/tur/tokagjelet',
+    utNoUrl: 'https://ut.no/turforslag/1111226/sundvordalen',
     merInfo: 'Start ved Kvandal fergeleie. Ikke egnet etter kraftig regnvær.',
     koordinater: [
       [60.3980, 6.5470],
@@ -427,7 +439,7 @@ const TURER = [
     beskrivelse: 'Opplev Hardangervidda – Europas høyeste platå. Fra Finse stasjon ut på den mektige vidda med reinsdyr, snøfelt og endeløs vidde.',
     startLat: 60.5933,
     startLng: 7.5067,
-    utNoUrl: 'https://www.ut.no/tur/hardangervidda-finse',
+    utNoUrl: 'https://ut.no/turforslag/1116108/hardangervidda-pa-langs-finse-skinnarbu',
     merInfo: 'Tog til Finse fra Bergen eller Oslo. Kle deg godt – det kan blåse hardt på vidda.',
     koordinater: [
       [60.5933, 7.5067],
@@ -450,7 +462,7 @@ const TURER = [
     beskrivelse: 'Gå langs kanten av det trange Nærøyfjorden (UNESCO), et av verdens vakreste fjordlandskap. Verdens trangeste fjord med bratte fjellvegger.',
     startLat: 60.8767,
     startLng: 6.8317,
-    utNoUrl: 'https://www.ut.no/tur/naeroy',
+    utNoUrl: 'https://ut.no/turforslag/1112155065/rimstigen',
     merInfo: 'Parkering i Gudvangen. Ta gjerne fjordsafari med el-båt.',
     koordinater: [
       [60.8767, 6.8317],
@@ -578,83 +590,94 @@ const RESTAURANTER = [
 const STANDARD_PLAN = [
   {
     dag: 1,
-    dato: '2026-06-13',
-    dagNavn: 'Lørdag 13. juni',
+    dato: '2026-06-12',
+    dagNavn: 'Fredag 12. juni',
     sted: 'Ulvik',
-    tittel: 'Ankomst Hardanger',
+    tittel: '💒 Bryllupsdag – Brakanes',
     hotell: 'brakanes',
     aktiviteter: [],
-    notater: 'Ankomst til Brakanes Hotell. Slapp av, utforsk Ulvik sentrum og smak på lokal eplesider. Aftenstur langs fjorden.',
+    notater: 'Ankomst Brakanes Hotell til bryllup! 🥂 Fest, feiring og fjord. Første av to netter på Brakanes. Parkering inkludert ved hotellet.',
     egne: []
   },
   {
     dag: 2,
-    dato: '2026-06-14',
-    dagNavn: 'Søndag 14. juni',
-    sted: 'Lofthus / Kinsarvik',
-    tittel: 'Dronningstien',
-    hotell: 'ullensvang',
-    aktiviteter: ['dronningstien'],
-    notater: 'Driv til Lofthus og gå den legendariske Dronningstien til Kinsarvik (5 timer). Sjekk inn på Ullensvang Hotel om kvelden.',
+    dato: '2026-06-13',
+    dagNavn: 'Lørdag 13. juni',
+    sted: 'Ulvik',
+    tittel: 'Dagen etter – Ulvik og eplesider',
+    hotell: 'brakanes',
+    aktiviteter: [],
+    notater: 'Andre natt på Brakanes. Slapp dag etter bryllupet. Utforsk Ulvik sentrum, smak på lokal eplesider hos Hardanger Saft og Siderfabrikk. Aftenstur langs fjorden. 🍎',
     egne: []
   },
   {
     dag: 3,
+    dato: '2026-06-14',
+    dagNavn: 'Søndag 14. juni',
+    sted: 'Lofthus / Kinsarvik',
+    tittel: 'Dronningstien 🥾',
+    hotell: 'ullensvang',
+    aktiviteter: ['dronningstien'],
+    notater: 'Sjekk ut fra Brakanes. Kjør til Opedal og gå den legendariske Dronningstien til Kinsarvik (5 timer, 12 km). Sjekk inn på Ullensvang Hotel om kvelden.',
+    egne: []
+  },
+  {
+    dag: 4,
     dato: '2026-06-15',
     dagNavn: 'Mandag 15. juni',
     sted: 'Eidfjord',
     tittel: 'Vøringsfossen & Hardangervidda',
     hotell: 'eidfjord',
     aktiviteter: ['voringsfossen'],
-    notater: 'Kjør via Hardangerbrua til Eidfjord. Besøk Vøringsfossen og Hardangervidda Nasjonalparksenter. Overnatt i Eidfjord.',
+    notater: 'Kjør via Kinsarvik og Eidfjord. Besøk Vøringsfossen (182 m) og Hardangervidda Nasjonalparksenter. Overnatt i Eidfjord.',
     egne: []
   },
   {
-    dag: 4,
+    dag: 5,
     dato: '2026-06-16',
     dagNavn: 'Tirsdag 16. juni',
     sted: 'Flåm',
     tittel: 'Flåmsbana & Nærøyfjord',
     hotell: 'fretheim',
     aktiviteter: ['naeroy'],
-    notater: 'Kjør via Gudvangen (Nærøyfjord). Ta Flåmsbana opp til Myrdal og ned igjen. Aftensbesøk på Ægir Bryggeri!',
+    notater: 'Kjør via Gudvangen og stopp ved Nærøyfjorden (UNESCO). Ta Flåmsbana opp til Myrdal og ned igjen. Aftensbesøk på Ægir Bryggeri! 🍺',
     egne: []
   },
   {
-    dag: 5,
+    dag: 6,
     dato: '2026-06-17',
     dagNavn: 'Onsdag 17. juni',
     sted: 'Aurland / Balestrand',
     tittel: 'Stegastein & Sognefjord',
     hotell: 'kviknes',
     aktiviteter: ['stegastein'],
-    notater: 'Morgentur til Stegastein utsiktspunkt. Kjør langs Sognefjorden til Balestrand og sjekk inn på historiske Kviknes Hotel.',
-    egne: []
-  },
-  {
-    dag: 6,
-    dato: '2026-06-18',
-    dagNavn: 'Torsdag 18. juni',
-    sted: 'Lærdal',
-    tittel: 'Borgund & Gamle Lærdal',
-    hotell: 'laerdal',
-    aktiviteter: [],
-    notater: 'Kjør til Borgund stavkirke (ca. 1180 e.Kr.), deretter inn i vakre Gamle Lærdalsøyri. Overnatt på Lindstrøm Hotel.',
+    notater: 'Morgentur til Stegastein utsiktspunkt (650 m over fjorden!). Kjør langs Sognefjorden til Balestrand og sjekk inn på historiske Kviknes Hotel.',
     egne: []
   },
   {
     dag: 7,
+    dato: '2026-06-18',
+    dagNavn: 'Torsdag 18. juni',
+    sted: 'Lærdal',
+    tittel: 'Borgund stavkirke & Gamle Lærdal',
+    hotell: 'laerdal',
+    aktiviteter: [],
+    notater: 'Kjør til Borgund stavkirke (ca. 1180 e.Kr.) – en av Norges best bevarte. Vandre rundt i vakre Gamle Lærdalsøyri med 161 fredede hus. Overnatt på Lindstrøm Hotel.',
+    egne: []
+  },
+  {
+    dag: 8,
     dato: '2026-06-19',
     dagNavn: 'Fredag 19. juni',
-    sted: 'Sogndal / hjemreise',
-    tittel: 'Siste dag i fjordlandet',
+    sted: 'Sogndal',
+    tittel: 'Siste fjorddag',
     hotell: 'sogndal',
     aktiviteter: [],
     notater: 'Siste fjorddag! Besøk Sognefjord-senteret eller gjør en kort tur. Overnatt i Sogndal for tidlig avreise neste dag.',
     egne: []
   },
   {
-    dag: 8,
+    dag: 9,
     dato: '2026-06-20',
     dagNavn: 'Lørdag 20. juni',
     sted: 'Hjemreise',

@@ -260,10 +260,60 @@ function renderInfoLenker() {
   });
 }
 
-// ---- Modal (bottom sheet) ----
+// ---- Modal (bottom sheet) — åpner info om et hotell ----
 function visStedModal(type, id) {
-  // Placeholder – kan utvides for full modal-visning
-  console.log('Modal:', type, id);
+  if (type !== 'hotell') return;
+  const h = HOTELLER.find(x => x.id === id);
+  if (!h) return;
+
+  const overlay = document.getElementById('modal-overlay');
+  const title   = document.getElementById('modal-title');
+  const sub     = document.getElementById('modal-subtitle');
+  const body    = document.getElementById('modal-body');
+
+  title.textContent = h.navn;
+  sub.textContent   = h.sted + ' · ' + h.region + ' · ' + '⭐'.repeat(h.stjerner || 0);
+
+  const stjernerHtml = h.stjerner ? '⭐'.repeat(h.stjerner) : '';
+  const idag    = APP_CONFIG.startDate;
+  const imorgen = datoForDag(1);
+  const bookUrl = lagBookingUrl(h.navn, h.sted, idag, imorgen);
+
+  body.innerHTML = `
+    <p style="font-size:14px;line-height:1.6;color:#1a2433;margin-bottom:14px">${h.beskrivelse}</p>
+
+    ${h.fasiliteter ? `
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#5a6b7c;margin-bottom:6px">Fasiliteter</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${h.fasiliteter.map(f => `<span style="background:#e8f4f8;color:#1a3a5c;font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px">${f}</span>`).join('')}
+      </div>
+    </div>` : ''}
+
+    <div style="margin-bottom:14px;display:flex;flex-direction:column;gap:6px">
+      ${h.telefon ? `<div style="font-size:13px;color:#5a6b7c">📞 <a href="tel:${h.telefon}" style="color:#2d8c6f">${h.telefon}</a></div>` : ''}
+      <div style="font-size:13px;color:#5a6b7c">🏷 Prisklasse: ${h.prisklasse || '–'}</div>
+      ${h.bryllup ? `<div style="font-size:13px;color:#c9a84c;font-weight:600">💒 Bryllupshotell – 12. juni 2026</div>` : ''}
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <a class="btn btn-primary" href="${bookUrl}" target="_blank" rel="noopener" style="justify-content:center">
+        📅 Book på Booking.com (2 voksne)
+      </a>
+      ${h.web ? `
+      <a class="btn btn-fjord" href="${h.web}" target="_blank" rel="noopener" style="justify-content:center">
+        🌐 Offisiell nettside
+      </a>` : ''}
+      ${h.wiki ? `
+      <a class="btn btn-outline" href="${h.wiki}" target="_blank" rel="noopener" style="justify-content:center">
+        📖 Wikipedia
+      </a>` : ''}
+      <button class="btn btn-outline" onclick="visHotellPaKart('${h.id}');lukkModal()" style="justify-content:center">
+        🗺 Vis på kart
+      </button>
+    </div>`;
+
+  overlay.classList.add('open');
 }
 
 function lukkModal() {

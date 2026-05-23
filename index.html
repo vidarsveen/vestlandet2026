@@ -83,7 +83,7 @@
     <section id="plan-pane" class="tab-pane" role="tabpanel">
       <div class="plan-header">
         <h2>📅 Dagsplan for turen</h2>
-        <p>13.–20. juni 2026 · Trykk på en dag for å redigere</p>
+        <p>12.–20. juni 2026 · Trykk på en dag for å redigere</p>
         <div class="plan-header-actions">
           <button class="btn btn-gull btn-sm" onclick="eksporterPlan()">
             📤 Del plan
@@ -146,7 +146,7 @@
         <div class="hero-emoji">🏔⛵🥾</div>
         <h2>Hardanger &amp; Sogn 2026</h2>
         <p>En uforglemmelig fjordreise for to.<br>
-        13.–20. juni · Start: Brakanes Hotell, Ulvik</p>
+        12.–20. juni · Start: Brakanes Hotell, Ulvik 💒</p>
       </div>
 
       <!-- Tur-sammendrag -->
@@ -155,7 +155,7 @@
         <div class="summary-grid">
           <div class="summary-item">
             <div class="summary-label">Start</div>
-            <div class="summary-value">13. juni</div>
+            <div class="summary-value">12. juni</div>
           </div>
           <div class="summary-item">
             <div class="summary-label">Slutt</div>
@@ -163,7 +163,7 @@
           </div>
           <div class="summary-item">
             <div class="summary-label">Netter</div>
-            <div class="summary-value">7 netter</div>
+            <div class="summary-value">8 netter</div>
           </div>
           <div class="summary-item">
             <div class="summary-label">Reisende</div>
@@ -309,9 +309,10 @@
 <div id="modal-overlay" onclick="lukkModal()">
   <div id="modal-sheet" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
-    <div class="modal-header">
+    <div class="modal-header" style="position:relative">
       <h3 id="modal-title">Info</h3>
       <p id="modal-subtitle"></p>
+      <button class="modal-close-btn" onclick="lukkModal()" aria-label="Lukk">✕</button>
     </div>
     <div class="modal-body" id="modal-body"></div>
   </div>
