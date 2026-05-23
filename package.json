@@ -1,0 +1,13 @@
+{
+  "name": "hardanger-og-sogn-reiseapp",
+  "version": "1.0.0",
+  "description": "Turistapp for Hardanger og Sogn – 13.–20. juni 2026",
+  "type": "commonjs",
+  "scripts": {
+    "test": "node tests/run-tests.js",
+    "serve": "npx serve . -p 3000"
+  },
+  "keywords": ["hardanger", "sognefjord", "norway", "travel", "tourism"],
+  "author": "Vidar",
+  "license": "MIT"
+}

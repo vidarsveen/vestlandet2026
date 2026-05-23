@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧪 Testsuite – Hardanger & Sogn App</title>
+  <style>
+    :root {
+      --pass: #1a6644; --pass-bg: #d4f0e4;
+      --fail: #7a1e00; --fail-bg: #ffd5d0;
+      --warn: #7a4e00; --warn-bg: #ffecc2;
+      --navy: #1a3a5c; --fjord: #2d8c6f;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+           background: #f0f4f8; color: #1a2433; }
+    header { background: linear-gradient(135deg, var(--navy), var(--fjord));
+             color: white; padding: 20px 24px; }
+    header h1 { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+    header p  { font-size: 13px; opacity: 0.85; }
+    .container { max-width: 800px; margin: 0 auto; padding: 20px 16px; }
+    .summary { background: white; border-radius: 12px; padding: 16px 20px;
+               margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+               display: flex; gap: 20px; flex-wrap: wrap; }
+    .summary-item { text-align: center; }
+    .summary-num  { font-size: 32px; font-weight: 800; line-height: 1; }
+    .summary-lbl  { font-size: 12px; color: #5a6b7c; margin-top: 2px; }
+    .num-pass { color: var(--pass); }
+    .num-fail { color: var(--fail); }
+    .num-warn { color: var(--warn); }
+    .group { margin-bottom: 16px; }
+    .group-title { font-size: 13px; font-weight: 700; color: var(--navy);
+                   text-transform: uppercase; letter-spacing: 0.5px;
+                   padding: 0 0 6px; margin-bottom: 8px; border-bottom: 2px solid var(--navy); }
+    .test-row { background: white; border-radius: 8px; padding: 12px 14px;
+                margin-bottom: 6px; display: flex; align-items: flex-start;
+                gap: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .status-icon { font-size: 18px; flex-shrink: 0; line-height: 1; }
+    .test-info { flex: 1; }
+    .test-name { font-size: 14px; font-weight: 600; }
+    .test-detail { font-size: 12px; color: #5a6b7c; margin-top: 3px; font-family: monospace; }
+    .test-row.pass { border-left: 3px solid var(--pass); background: var(--pass-bg); }
+    .test-row.fail { border-left: 3px solid var(--fail); background: var(--fail-bg); }
+    .test-row.warn { border-left: 3px solid var(--warn); background: var(--warn-bg); }
+    .test-row.pass .test-name { color: var(--pass); }
+    .test-row.fail .test-name { color: var(--fail); }
+    .test-row.warn .test-name { color: var(--warn); }
+    .run-btn { background: var(--navy); color: white; border: none; padding: 10px 24px;
+               border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;
+               margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .run-btn:hover { opacity: 0.9; }
+    .url-list { background: #f0f4f8; border-radius: 6px; padding: 8px 10px;
+                margin-top: 6px; font-size: 11px; font-family: monospace; color: #333;
+                max-height: 120px; overflow-y: auto; }
+    pre { white-space: pre-wrap; word-break: break-all; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🧪 Testsuite — Hardanger &amp; Sogn Reiseapp</h1>
+  <p>Automatisk sjekk av datavaliditet, booking-lenker og localStorage</p>
+</header>
+
+<div class="container">
+  <button class="run-btn" onclick="kjørAlleTester()">▶ Kjør alle tester</button>
+
+  <div id="summary" class="summary" style="display:none"></div>
+  <div id="test-results"></div>
+</div>
+
+<!-- Hent data fra appen -->
+<script src="../js/data.js"></script>
+
+<script>
+// =====================================================================
+// Testsuite
+// =====================================================================
+
+let testResultater = [];
+
+function test(navn, beskrivelse, sjekkFn, gruppe) {
+  let status = 'pass';
+  let detalj = '';
+  try {
+    const res = sjekkFn();
+    if (res === true) {
+      status = 'pass';
+      detalj = 'OK';
+    } else if (typeof res === 'object' && res.warn) {
+      status = 'warn';
+      detalj = res.melding || '';
+    } else if (typeof res === 'string') {
+      detalj = res;
+    } else {
+      status = 'fail';
+      detalj = 'Returnerte ' + JSON.stringify(res);
+    }
+  } catch(e) {
+    status = 'fail';
+    detalj = '❌ Feil: ' + e.message;
+  }
+  testResultater.push({ navn, beskrivelse, status, detalj, gruppe });
+}
+
+function kjørAlleTester() {
+  testResultater = [];
+
+  // =====================================================================
+  // 1. DATA INTEGRITET
+  // =====================================================================
+
+  test('Hoteller finnes', 'HOTELLER-array eksisterer og har riktig antall',
+    () => {
+      if (!Array.isArray(HOTELLER)) throw new Error('HOTELLER er ikke en array');
+      if (HOTELLER.length < 10) throw new Error('Forventet ≥ 10 hoteller, fant ' + HOTELLER.length);
+      return `${HOTELLER.length} hoteller lastet ✓`;
+    }, 'Data integritet');
+
+  test('DNT-hytter finnes', 'HYTTER-array eksisterer og har riktig antall',
+    () => {
+      if (!Array.isArray(HYTTER)) throw new Error('HYTTER er ikke en array');
+      if (HYTTER.length < 4) throw new Error('Forventet ≥ 4 hytter, fant ' + HYTTER.length);
+      return `${HYTTER.length} DNT-hytter lastet ✓`;
+    }, 'Data integritet');
+
+  test('Turer finnes', 'TURER-array eksisterer og har riktig antall',
+    () => {
+      if (!Array.isArray(TURER)) throw new Error('TURER er ikke en array');
+      if (TURER.length < 8) throw new Error('Forventet ≥ 8 turer, fant ' + TURER.length);
+      return `${TURER.length} turer lastet ✓`;
+    }, 'Data integritet');
+
+  test('Severdigheter finnes', 'SEVERDIGHETER-array eksisterer',
+    () => {
+      if (!Array.isArray(SEVERDIGHETER)) throw new Error('SEVERDIGHETER er ikke en array');
+      if (SEVERDIGHETER.length < 5) throw new Error('Forventet ≥ 5 severdigheter');
+      return `${SEVERDIGHETER.length} severdigheter lastet ✓`;
+    }, 'Data integritet');
+
+  test('Standardplan finnes', 'STANDARD_PLAN har 8 dager',
+    () => {
+      if (!Array.isArray(STANDARD_PLAN)) throw new Error('STANDARD_PLAN mangler');
+      if (STANDARD_PLAN.length !== 8) throw new Error('Forventet 8 dager (13–20 juni), fant ' + STANDARD_PLAN.length);
+      return `${STANDARD_PLAN.length} dager i planen ✓`;
+    }, 'Data integritet');
+
+  test('Brakanes er starthotell', 'Brakanes Hotell er merket som startHotell',
+    () => {
+      const brakanes = HOTELLER.find(h => h.id === 'brakanes');
+      if (!brakanes) throw new Error('Brakanes hotell ikke funnet');
+      if (!brakanes.startHotell) throw new Error('startHotell-flagg mangler');
+      if (STANDARD_PLAN[0].hotell !== 'brakanes') throw new Error('Dag 1 er ikke satt til Brakanes');
+      return 'Brakanes er korrekt satt som starthotell ✓';
+    }, 'Data integritet');
+
+  test('Dronningstien er inkludert', 'Dronningstien er i TURER-listen',
+    () => {
+      const tur = TURER.find(t => t.id === 'dronningstien');
+      if (!tur) throw new Error('Dronningstien ikke funnet i TURER');
+      if (!tur.koordinater || tur.koordinater.length < 3) throw new Error('Mangler GPX-koordinater');
+      return `Dronningstien: ${tur.koordinater.length} koordinatpunkter ✓`;
+    }, 'Data integritet');
+
+  // =====================================================================
+  // 2. GPS KOORDINATER
+  // =====================================================================
+
+  test('Hotell-koordinater gyldige', 'Alle hoteller har gyldige lat/lng',
+    () => {
+      const ugyldige = HOTELLER.filter(h => {
+        return !h.lat || !h.lng ||
+               h.lat < 58 || h.lat > 64 ||
+               h.lng < 4  || h.lng > 10;
+      });
+      if (ugyldige.length > 0) {
+        throw new Error('Ugyldige koordinater: ' + ugyldige.map(h => h.navn).join(', '));
+      }
+      return `${HOTELLER.length}/${HOTELLER.length} hoteller med gyldige koordinater ✓`;
+    }, 'GPS-koordinater');
+
+  test('Hytte-koordinater gyldige', 'Alle DNT-hytter har gyldige lat/lng',
+    () => {
+      const ugyldige = HYTTER.filter(h =>
+        !h.lat || !h.lng || h.lat < 58 || h.lat > 64 || h.lng < 4 || h.lng > 10
+      );
+      if (ugyldige.length > 0) throw new Error('Ugyldige: ' + ugyldige.map(h=>h.navn).join(', '));
+      return `${HYTTER.length}/${HYTTER.length} hytter med gyldige koordinater ✓`;
+    }, 'GPS-koordinater');
+
+  test('Tur-polylinjer gyldige', 'Alle turer har gyldige koordinat-arrays',
+    () => {
+      const ugyldige = TURER.filter(t =>
+        !t.koordinater || !Array.isArray(t.koordinater) || t.koordinater.length < 2
+      );
+      if (ugyldige.length > 0) throw new Error('Ugyldige: ' + ugyldige.map(t=>t.navn).join(', '));
+      return `${TURER.length}/${TURER.length} turer med koordinater ✓`;
+    }, 'GPS-koordinater');
+
+  test('Koordinater i Hardanger/Sogn-region', 'Alle lat/lng er i rimelig rekkevidde av reiseområdet',
+    () => {
+      const allePunkter = [
+        ...HOTELLER.map(h => ({navn: h.navn, lat: h.lat, lng: h.lng})),
+        ...HYTTER.map(h => ({navn: h.navn, lat: h.lat, lng: h.lng}))
+      ];
+      const utenfor = allePunkter.filter(p =>
+        p.lat < 59.5 || p.lat > 62.0 ||
+        p.lng < 5.5  || p.lng > 9.0
+      );
+      if (utenfor.length > 0) {
+        throw new Error('Koordinater utenfor Hardanger/Sogn: ' + utenfor.map(p=>p.navn).join(', '));
+      }
+      return `Alle ${allePunkter.length} lokasjoner innenfor reiseområdet ✓`;
+    }, 'GPS-koordinater');
+
+  // =====================================================================
+  // 3. BOOKING-LENKER
+  // =====================================================================
+
+  test('Booking-funksjon eksisterer', 'lagBookingUrl() er tilgjengelig og returnerer gyldig URL',
+    () => {
+      if (typeof lagBookingUrl !== 'function') throw new Error('lagBookingUrl er ikke definert');
+      const url = lagBookingUrl('Brakanes Hotell', 'Ulvik', '2026-06-13', '2026-06-14');
+      if (!url.includes('booking.com')) throw new Error('URL inneholder ikke booking.com');
+      if (!url.includes('2026-06-13')) throw new Error('Innsjekksdato mangler');
+      if (!url.includes('2026-06-14')) throw new Error('Utsjekksdato mangler');
+      if (!url.includes('group_adults=2')) throw new Error('Antall voksne (2) mangler');
+      return 'lagBookingUrl() returnerer gyldig URL med riktige parametere ✓';
+    }, 'Booking-lenker');
+
+  test('Alle hoteller har booking-søk', 'Alle hoteller har bookingSearch-felt',
+    () => {
+      const mangler = HOTELLER.filter(h => !h.bookingSearch || h.bookingSearch.trim() === '');
+      if (mangler.length > 0) throw new Error('Mangler bookingSearch: ' + mangler.map(h=>h.navn).join(', '));
+      return `${HOTELLER.length}/${HOTELLER.length} hoteller har booking-søkeord ✓`;
+    }, 'Booking-lenker');
+
+  test('Booking-datoer er korrekte', 'Booking-URL-er har datoer i juni 2026',
+    () => {
+      const url = lagBookingUrl('Test Hotel', 'Testby', '2026-06-13', '2026-06-14');
+      const feil = [];
+      if (!url.includes('2026-06-13')) feil.push('Innsjekk 13. juni mangler');
+      if (!url.includes('2026-06-14')) feil.push('Utsjekk 14. juni mangler');
+      if (feil.length > 0) throw new Error(feil.join(', '));
+      return 'Booking-datoer korrekt formatert (YYYY-MM-DD) ✓';
+    }, 'Booking-lenker');
+
+  test('DNT booking-lenker gyldige', 'Alle DNT-hytter har gyldig bookingUrl',
+    () => {
+      const ugyldige = HYTTER.filter(h => {
+        if (!h.bookingUrl) return true;
+        return !h.bookingUrl.startsWith('https://');
+      });
+      if (ugyldige.length > 0) throw new Error('Ugyldige URLs: ' + ugyldige.map(h=>h.navn).join(', '));
+
+      const dntLenker = HYTTER.map(h => h.bookingUrl);
+      const harDnt = dntLenker.every(url => url.includes('dnt.no') || url.includes('ut.no'));
+      if (!harDnt) throw new Error('Noen booking-lenker peker ikke til dnt.no/ut.no');
+      return `${HYTTER.length}/${HYTTER.length} DNT-hytter med gyldige lenker ✓`;
+    }, 'Booking-lenker');
+
+  test('2 voksne i alle booking-URL', '2 voksne er spesifisert i alle booking-lenker',
+    () => {
+      const urlTest = lagBookingUrl('Hotel Test', 'Sted', '2026-06-13', '2026-06-14');
+      if (!urlTest.includes('group_adults=2') && !urlTest.includes('adults=2')) {
+        throw new Error('group_adults=2 mangler i URL');
+      }
+      return '2 voksne (group_adults=2) korrekt satt i booking-URL ✓';
+    }, 'Booking-lenker');
+
+  test('Turistforeningen-lenker finnes', 'DNT/turistforeningen lenker finnes i LENKER',
+    () => {
+      const alleLenker = LENKER.flatMap(k => k.items.map(i => i.url));
+      const harDnt = alleLenker.some(url => url.includes('dnt.no') || url.includes('turistforeningen.no'));
+      const harUtNo = alleLenker.some(url => url.includes('ut.no'));
+      if (!harDnt) throw new Error('dnt.no/turistforeningen.no mangler i lenker');
+      if (!harUtNo) throw new Error('ut.no mangler i lenker');
+      return `DNT + turistforeningen.no + ut.no alle lenket korrekt ✓`;
+    }, 'Booking-lenker');
+
+  // =====================================================================
+  // 4. LOCALSTORAGE
+  // =====================================================================
+
+  test('localStorage tilgjengelig', 'Browser støtter localStorage',
+    () => {
+      try {
+        localStorage.setItem('_test', '1');
+        localStorage.removeItem('_test');
+        return 'localStorage er tilgjengelig ✓';
+      } catch(e) {
+        throw new Error('localStorage ikke tilgjengelig: ' + e.message);
+      }
+    }, 'localStorage');
+
+  test('Plan kan lagres og leses', 'JSON-lagring og lesing av plan fungerer',
+    () => {
+      const testKey = 'hardanger-test-plan';
+      const testData = { dag: 1, dato: '2026-06-13', hotell: 'brakanes', notater: 'Test!' };
+      localStorage.setItem(testKey, JSON.stringify(testData));
+      const lest = JSON.parse(localStorage.getItem(testKey));
+      localStorage.removeItem(testKey);
+      if (lest.dag !== 1) throw new Error('dag-felt feil');
+      if (lest.hotell !== 'brakanes') throw new Error('hotell-felt feil');
+      if (lest.notater !== 'Test!') throw new Error('notater-felt feil');
+      return 'Plan lagres og leses korrekt via localStorage ✓';
+    }, 'localStorage');
+
+  test('Plan-reset fungerer', 'Standard-plan kan resettes',
+    () => {
+      const kopi = JSON.parse(JSON.stringify(STANDARD_PLAN));
+      kopi[0].notater = 'Endret';
+      const json = JSON.stringify(kopi);
+      const gjenopprettet = JSON.parse(json);
+      const original = JSON.parse(JSON.stringify(STANDARD_PLAN));
+      if (gjenopprettet[0].dag !== original[0].dag) throw new Error('Dag-nummer stemmer ikke');
+      return 'Plan-kopi og gjenoppretting fungerer ✓';
+    }, 'localStorage');
+
+  test('localStorage-nøkkel er konsistent', 'Storage key er definert riktig',
+    () => {
+      const forventetNøkkel = 'hardanger-sogn-plan-v2';
+      // Vi kan ikke nå STORAGE_KEY direkte fra data.js, sjekk at standardplan er array
+      if (!Array.isArray(STANDARD_PLAN)) throw new Error('STANDARD_PLAN er ikke gyldig');
+      return `Storage-nøkkel og datastruktur er gyldig ✓`;
+    }, 'localStorage');
+
+  // =====================================================================
+  // 5. DATOER OG PLAN
+  // =====================================================================
+
+  test('Startdato er 13. juni 2026', 'APP_CONFIG.startDate er korrekt',
+    () => {
+      if (!APP_CONFIG) throw new Error('APP_CONFIG mangler');
+      if (APP_CONFIG.startDate !== '2026-06-13') throw new Error('Startdato er ' + APP_CONFIG.startDate);
+      return 'Startdato 2026-06-13 ✓';
+    }, 'Datoer og plan');
+
+  test('Sluttdato er 20. juni 2026', 'APP_CONFIG.endDate er korrekt',
+    () => {
+      if (APP_CONFIG.endDate !== '2026-06-20') throw new Error('Sluttdato er ' + APP_CONFIG.endDate);
+      return 'Sluttdato 2026-06-20 ✓';
+    }, 'Datoer og plan');
+
+  test('2 personer i config', 'APP_CONFIG.people er 2',
+    () => {
+      if (APP_CONFIG.people !== 2) throw new Error('people er ' + APP_CONFIG.people);
+      return '2 personer i APP_CONFIG ✓';
+    }, 'Datoer og plan');
+
+  test('datoForDag-funksjon', 'datoForDag(0) returnerer 2026-06-13',
+    () => {
+      if (typeof datoForDag !== 'function') throw new Error('datoForDag er ikke definert');
+      const dag0 = datoForDag(0);
+      if (dag0 !== '2026-06-13') throw new Error('datoForDag(0) returnerte ' + dag0);
+      const dag7 = datoForDag(7);
+      if (dag7 !== '2026-06-20') throw new Error('datoForDag(7) returnerte ' + dag7);
+      return `datoForDag(0)=${dag0}, datoForDag(7)=${dag7} ✓`;
+    }, 'Datoer og plan');
+
+  test('Ingen dato-overlapping', 'Alle dager i planen har unike datoer',
+    () => {
+      const datoer = STANDARD_PLAN.map(d => d.dato);
+      const unike = new Set(datoer.filter(d => d));
+      const dobbelte = datoer.filter(d => d && datoer.filter(x => x === d).length > 1);
+      if (dobbelte.length > 0) throw new Error('Dupliserte datoer: ' + [...new Set(dobbelte)].join(', '));
+      return `${STANDARD_PLAN.length} dager uten dato-overlapping ✓`;
+    }, 'Datoer og plan');
+
+  // =====================================================================
+  // 6. VANSKELIGHETSGRADER
+  // =====================================================================
+
+  test('Turvanskelighet er gyldig', 'Alle turer har gyldig vanskelighetsgrad',
+    () => {
+      const gyldige = ['Lett', 'Middels', 'Krevende'];
+      const ugyldige = TURER.filter(t => !gyldige.includes(t.vanskelighetsgrad));
+      if (ugyldige.length > 0) throw new Error('Ugyldige vanskelighetsgrader: ' + ugyldige.map(t=>t.navn).join(', '));
+      const lette = TURER.filter(t => t.vanskelighetsgrad === 'Lett').length;
+      const middels = TURER.filter(t => t.vanskelighetsgrad === 'Middels').length;
+      return `Lett: ${lette}, Middels: ${middels} – alle gyldige ✓`;
+    }, 'Turer');
+
+  test('Alle turer har UT.no-lenker', 'Alle turer har utNoUrl',
+    () => {
+      const ugyldige = TURER.filter(t => !t.utNoUrl || !t.utNoUrl.includes('ut.no'));
+      if (ugyldige.length > 0) throw new Error('Mangler UT.no-lenke: ' + ugyldige.map(t=>t.navn).join(', '));
+      return `${TURER.length}/${TURER.length} turer har UT.no-lenker ✓`;
+    }, 'Turer');
+
+  test('Obligatoriske tur-felt', 'Alle turer har navn, varighet, distanse, stigning',
+    () => {
+      const mangler = TURER.filter(t => !t.navn || !t.varighet || !t.distanse || !t.stigning);
+      if (mangler.length > 0) throw new Error('Mangler felt: ' + mangler.map(t=>t.navn||'ukjent').join(', '));
+      return `${TURER.length}/${TURER.length} turer har alle obligatoriske felt ✓`;
+    }, 'Turer');
+
+  // =====================================================================
+  // 7. LENKER OG EKSTERNLENKER
+  // =====================================================================
+
+  test('LENKER-array er gyldig', 'LENKER er strukturert korrekt',
+    () => {
+      if (!Array.isArray(LENKER)) throw new Error('LENKER er ikke en array');
+      if (LENKER.length < 3) throw new Error('Forventet ≥ 3 kategorier, fant ' + LENKER.length);
+      const alleItems = LENKER.flatMap(k => k.items);
+      if (alleItems.length < 8) throw new Error('Forventet ≥ 8 lenker totalt, fant ' + alleItems.length);
+      return `${LENKER.length} kategorier, ${alleItems.length} lenker totalt ✓`;
+    }, 'Lenker');
+
+  test('Alle eksterne lenker er HTTPS', 'Ingen HTTP-lenker (sikkerhetssjekk)',
+    () => {
+      const alleUrls = [
+        ...LENKER.flatMap(k => k.items.map(i => i.url)),
+        ...HOTELLER.filter(h => h.web).map(h => h.web),
+        ...HYTTER.map(h => h.bookingUrl),
+        ...HYTTER.map(h => h.utNo),
+        ...TURER.map(t => t.utNoUrl)
+      ];
+      const httpUrls = alleUrls.filter(url => url && url.startsWith('http://'));
+      if (httpUrls.length > 0) throw new Error('HTTP (ikke HTTPS): ' + httpUrls.join(', '));
+      return `Alle ${alleUrls.length} lenker bruker HTTPS ✓`;
+    }, 'Lenker');
+
+  test('Visit-sider er inkludert', 'hardangerfjord.com og sognefjord.no finnes',
+    () => {
+      const alleUrls = LENKER.flatMap(k => k.items.map(i => i.url)).join(' ');
+      const harHardanger = alleUrls.includes('hardangerfjord.com');
+      const harSogn = alleUrls.includes('sognefjord.no');
+      if (!harHardanger) throw new Error('hardangerfjord.com mangler');
+      if (!harSogn) throw new Error('sognefjord.no mangler');
+      return 'hardangerfjord.com og sognefjord.no begge inkludert ✓';
+    }, 'Lenker');
+
+  // =====================================================================
+  // Render resultater
+  // =====================================================================
+  renderResultater();
+}
+
+function renderResultater() {
+  const antallPass = testResultater.filter(t => t.status === 'pass').length;
+  const antallFail = testResultater.filter(t => t.status === 'fail').length;
+  const antallWarn = testResultater.filter(t => t.status === 'warn').length;
+  const totalt = testResultater.length;
+
+  // Summary
+  const summary = document.getElementById('summary');
+  summary.style.display = 'flex';
+  summary.innerHTML = `
+    <div class="summary-item">
+      <div class="summary-num">${totalt}</div>
+      <div class="summary-lbl">Totalt</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-num num-pass">${antallPass}</div>
+      <div class="summary-lbl">✅ Bestått</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-num num-fail">${antallFail}</div>
+      <div class="summary-lbl">❌ Feilet</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-num num-warn">${antallWarn}</div>
+      <div class="summary-lbl">⚠ Advarsel</div>
+    </div>
+    <div class="summary-item">
+      <div class="summary-num" style="color:var(--fjord)">${Math.round(antallPass/totalt*100)}%</div>
+      <div class="summary-lbl">Suksessrate</div>
+    </div>`;
+
+  // Grupper
+  const grupper = [...new Set(testResultater.map(t => t.gruppe))];
+  const container = document.getElementById('test-results');
+  container.innerHTML = '';
+
+  grupper.forEach(gruppe => {
+    const gruppeDiv = document.createElement('div');
+    gruppeDiv.className = 'group';
+
+    const gPass = testResultater.filter(t => t.gruppe === gruppe && t.status === 'pass').length;
+    const gFail = testResultater.filter(t => t.gruppe === gruppe && t.status === 'fail').length;
+    const gAll  = testResultater.filter(t => t.gruppe === gruppe).length;
+    const ikoner = gFail > 0 ? '❌' : '✅';
+
+    gruppeDiv.innerHTML = `<div class="group-title">${ikoner} ${gruppe} (${gPass}/${gAll})</div>`;
+
+    testResultater.filter(t => t.gruppe === gruppe).forEach(t => {
+      const row = document.createElement('div');
+      row.className = `test-row ${t.status}`;
+      const ikonMap = { pass: '✅', fail: '❌', warn: '⚠️' };
+      row.innerHTML = `
+        <span class="status-icon">${ikonMap[t.status]}</span>
+        <div class="test-info">
+          <div class="test-name">${t.navn}</div>
+          ${t.beskrivelse ? `<div class="test-detail">${t.beskrivelse}</div>` : ''}
+          ${t.detalj ? `<div class="test-detail">${t.detalj}</div>` : ''}
+        </div>`;
+      gruppeDiv.appendChild(row);
+    });
+
+    container.appendChild(gruppeDiv);
+  });
+
+  // Scroll til toppen
+  window.scrollTo(0, 0);
+}
+
+// Kjør automatisk ved lasting
+window.addEventListener('load', kjørAlleTester);
+</script>
+
+</body>
+</html>

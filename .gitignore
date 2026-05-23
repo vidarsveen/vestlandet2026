@@ -1,0 +1,21 @@
+# Node
+node_modules/
+npm-debug.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Python venv (eksisterende fra prosjektmappen)
+venv/
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Midlertidige filer
+*.tmp
+*.bak

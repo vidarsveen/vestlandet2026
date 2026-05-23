@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1a3a5c">
+  <meta name="description" content="Reiseapp for Hardanger og Sogn – 13.–20. juni 2026">
+  <title>🏔 Hardanger & Sogn Reise</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ==================== HEADER ==================== -->
+  <header id="app-header">
+    <div class="header-logo">🏔</div>
+    <div class="header-title">
+      <h1>Hardanger &amp; Sogn</h1>
+      <p>13.–20. juni 2026 · 2 personer</p>
+    </div>
+    <div class="header-badge">7 netter</div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main id="main-content">
+
+    <!-- ======= KART-TAB ======= -->
+    <section id="kart-pane" class="tab-pane" role="tabpanel">
+
+      <!-- Filter-bar -->
+      <div id="map-filter-bar">
+        <div class="filter-chip active" data-filter="hoteller" onclick="toggleMapFilter('hoteller')">
+          🏨 Hoteller
+        </div>
+        <div class="filter-chip active" data-filter="hytter" onclick="toggleMapFilter('hytter')">
+          ⛺ DNT/Camping
+        </div>
+        <div class="filter-chip active" data-filter="turer" onclick="toggleMapFilter('turer')">
+          🥾 Turer
+        </div>
+        <div class="filter-chip active" data-filter="severdigheter" onclick="toggleMapFilter('severdigheter')">
+          📷 Severdigheter
+        </div>
+      </div>
+
+      <!-- Leaflet kart -->
+      <div id="map-container">
+        <div id="map"></div>
+      </div>
+
+      <!-- Tegnforklaring -->
+      <div id="map-legend">
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#1a3a5c"></div>
+          Hotell
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#2d8c6f"></div>
+          DNT-hytte
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#e8a020"></div>
+          Tursti
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#8b4cbc"></div>
+          Severdighet
+        </div>
+      </div>
+    </section>
+
+    <!-- ======= DAGSPLAN-TAB ======= -->
+    <section id="plan-pane" class="tab-pane" role="tabpanel">
+      <div class="plan-header">
+        <h2>📅 Dagsplan for turen</h2>
+        <p>13.–20. juni 2026 · Trykk på en dag for å redigere</p>
+        <div class="plan-header-actions">
+          <button class="btn btn-gull btn-sm" onclick="eksporterPlan()">
+            📤 Del plan
+          </button>
+          <button class="btn btn-outline btn-sm" style="color:white;border-color:rgba(255,255,255,0.4)" onclick="nullstillPlan()">
+            🔄 Nullstill
+          </button>
+        </div>
+      </div>
+
+      <div id="plan-liste">
+        <!-- Fylles inn av planner.js -->
+        <div class="loading">
+          <div class="spinner"></div>
+          Laster plan…
+        </div>
+      </div>
+    </section>
+
+    <!-- ======= STEDER-TAB ======= -->
+    <section id="steder-pane" class="tab-pane" role="tabpanel">
+      <div class="section-header">
+        <h2>📍 Steder &amp; Aktiviteter</h2>
+        <p>Hoteller, DNT-hytter, turer og severdigheter</p>
+      </div>
+
+      <!-- Filter -->
+      <div class="steder-filter-bar">
+        <div class="filter-chip active" data-filter="alle" onclick="filterSteder('alle')">
+          Alle
+        </div>
+        <div class="filter-chip" data-filter="hoteller" onclick="filterSteder('hoteller')">
+          🏨 Hoteller
+        </div>
+        <div class="filter-chip" data-filter="hytter" onclick="filterSteder('hytter')">
+          ⛺ DNT-hytter
+        </div>
+        <div class="filter-chip" data-filter="turer" onclick="filterSteder('turer')">
+          🥾 Turer
+        </div>
+        <div class="filter-chip" data-filter="severdigheter" onclick="filterSteder('severdigheter')">
+          📷 Severdigheter
+        </div>
+      </div>
+
+      <div id="steder-liste" class="steder-list">
+        <!-- Fylles inn av app.js -->
+        <div class="loading">
+          <div class="spinner"></div>
+          Laster steder…
+        </div>
+      </div>
+    </section>
+
+    <!-- ======= INFO-TAB ======= -->
+    <section id="info-pane" class="tab-pane" role="tabpanel">
+
+      <!-- Hero -->
+      <div class="info-hero">
+        <div class="hero-emoji">🏔⛵🥾</div>
+        <h2>Hardanger &amp; Sogn 2026</h2>
+        <p>En uforglemmelig fjordreise for to.<br>
+        13.–20. juni · Start: Brakanes Hotell, Ulvik</p>
+      </div>
+
+      <!-- Tur-sammendrag -->
+      <div class="trip-summary-card">
+        <h3>🗺 Tursammendrag</h3>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <div class="summary-label">Start</div>
+            <div class="summary-value">13. juni</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">Slutt</div>
+            <div class="summary-value">20. juni</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">Netter</div>
+            <div class="summary-value">7 netter</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">Reisende</div>
+            <div class="summary-value">2 personer</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">Hoteller</div>
+            <div class="summary-value">10 valg</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">Turer</div>
+            <div class="summary-value">8 ruter</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Regioner -->
+      <div class="info-section" style="margin-top:12px">
+        <h3>Regioner</h3>
+        <div class="link-card">
+          <div class="link-item" style="cursor:default">
+            <span class="link-icon">🌊</span>
+            <span class="link-text">
+              <span class="link-name">Hardanger</span>
+              <span class="link-desc">Ulvik, Lofthus, Kinsarvik, Eidfjord, Odda</span>
+            </span>
+          </div>
+          <div class="link-item" style="cursor:default">
+            <span class="link-icon">🚂</span>
+            <span class="link-text">
+              <span class="link-name">Flåm &amp; Aurland</span>
+              <span class="link-desc">Flåmsbana, Nærøyfjord (UNESCO), Stegastein</span>
+            </span>
+          </div>
+          <div class="link-item" style="cursor:default">
+            <span class="link-icon">⛵</span>
+            <span class="link-text">
+              <span class="link-name">Balestrand &amp; Sogndal</span>
+              <span class="link-desc">Sognefjord, Kviknes Hotel (historisk)</span>
+            </span>
+          </div>
+          <div class="link-item" style="cursor:default">
+            <span class="link-icon">🏰</span>
+            <span class="link-text">
+              <span class="link-name">Lærdal &amp; Borgund</span>
+              <span class="link-desc">Borgund stavkirke, Gamle Lærdalsøyri</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lenker -->
+      <div id="info-lenker">
+        <!-- Fylles av app.js -->
+      </div>
+
+      <!-- Tips -->
+      <div class="info-section">
+        <h3>Praktiske tips</h3>
+        <div class="link-card">
+          <div class="link-item" style="cursor:default">
+            <span class="link-icon">🌤</span>
+            <span class="link-text">
+              <span class="link-name">Vær i juni</span>
+              <span class="link-desc">Typisk 15–20°C. Ta med regntøy – fjordvær er uforutsigbart!</span>
+            </span>
+          </div>
+          <div class="link-item" style="cursor:default">
+            <span class="link-icon">🚗</span>
+            <span class="link-text">
+              <span class="link-name">Kjøring</span>
+              <span class="link-desc">Mange smale fjordveier. Ta god tid og nyt utsikten. Bompenger på bl.a. Hardangerbrua.</span>
+            </span>
+          </div>
+          <div class="link-item" style="cursor:default">
+            <span class="link-icon">💳</span>
+            <span class="link-text">
+              <span class="link-name">DNT-medlemskap</span>
+              <span class="link-desc">Spar penger på DNT-hytter med medlemskap (kr 790/år). Kjøp på dnt.no</span>
+            </span>
+          </div>
+          <div class="link-item" style="cursor:default">
+            <span class="link-icon">📱</span>
+            <span class="link-text">
+              <span class="link-name">Offline kart</span>
+              <span class="link-desc">Last ned Maps.me eller UT.no offline for dekning i fjellet.</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Om appen -->
+      <div class="info-section mb-12">
+        <h3>Om appen</h3>
+        <div class="link-card">
+          <div class="link-item" style="cursor:default">
+            <span class="link-icon">💾</span>
+            <span class="link-text">
+              <span class="link-name">Lagring</span>
+              <span class="link-desc">Planen din lagres automatisk på denne enheten (localStorage). Ingen konto nødvendig.</span>
+            </span>
+          </div>
+          <div class="link-item" style="cursor:default">
+            <span class="link-icon">🗺</span>
+            <span class="link-text">
+              <span class="link-name">Kart</span>
+              <span class="link-desc">OpenStreetMap – gratis og åpent. Trykk på markører for info og booking-lenker.</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main><!-- /main-content -->
+
+  <!-- ==================== BOTTOM NAVIGATION ==================== -->
+  <nav id="bottom-nav" role="navigation" aria-label="Hovednavigasjon">
+    <button class="nav-btn active" data-tab="kart" aria-label="Kart">
+      <span class="nav-icon">🗺</span>
+      <span>Kart</span>
+    </button>
+    <button class="nav-btn" data-tab="plan" aria-label="Dagsplan">
+      <span class="nav-icon">📅</span>
+      <span>Dagsplan</span>
+    </button>
+    <button class="nav-btn" data-tab="steder" aria-label="Steder">
+      <span class="nav-icon">📍</span>
+      <span>Steder</span>
+    </button>
+    <button class="nav-btn" data-tab="info" aria-label="Info">
+      <span class="nav-icon">ℹ️</span>
+      <span>Info</span>
+    </button>
+  </nav>
+
+</div><!-- /app -->
+
+<!-- Toast-melding -->
+<div id="toast" role="status" aria-live="polite"></div>
+
+<!-- Modal (bottom sheet) -->
+<div id="modal-overlay" onclick="lukkModal()">
+  <div id="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <h3 id="modal-title">Info</h3>
+      <p id="modal-subtitle"></p>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- ==================== SCRIPTS ==================== -->
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLs=" crossorigin=""></script>
+
+<!-- App scripts -->
+<script src="js/data.js"></script>
+<script src="js/map.js"></script>
+<script src="js/planner.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
