@@ -430,14 +430,15 @@ a:hover { text-decoration: underline; }
   grid-template-columns: repeat(4, 1fr);
   gap: 6px;
   flex-shrink: 0;
+  overflow: hidden; /* forhindrer horisontal scroll */
 }
 
 .filter-chip {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 6px 8px;
+  gap: 3px;
+  padding: 6px 4px;
   border-radius: 20px;
   border: 1.5px solid var(--border);
   background: var(--white);
@@ -445,10 +446,13 @@ a:hover { text-decoration: underline; }
   font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
-  white-space: nowrap;
+  min-width: 0;          /* nøkkel: lar gridet krysse chipens innholdsbredde */
+  white-space: normal;   /* tillat linjeskift i lange labels */
+  line-height: 1.2;
   transition: all 0.15s;
   -webkit-tap-highlight-color: transparent;
   text-align: center;
+  word-break: break-word;
 }
 
 .filter-chip.active {
@@ -740,6 +744,7 @@ a:hover { text-decoration: underline; }
   position: sticky;
   top: 65px;   /* under søkefeltet */
   z-index: 10;
+  overflow: hidden;
 }
 
 /* "Alle"-chip strekker over 2 kolonner (1+3 layout øverst) */
