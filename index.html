@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="lib/leaflet.css"/>
 
   <!-- App CSS -->
-  <link rel="stylesheet" href="css/style.css?v=6">
+  <link rel="stylesheet" href="css/style.css?v=7">
 </head>
 <body>
 
@@ -59,6 +59,30 @@
       <!-- Leaflet kart -->
       <div id="map-container">
         <div id="map"></div>
+
+        <!-- Spill gjennom turen knapp -->
+        <button class="spill-trigger-btn" onclick="startSpiller()" title="Spill gjennom turen dag for dag (piltaster ◀▶ / Esc)">
+          ▶ Spill
+        </button>
+
+        <!-- Dag-for-dag overlay -->
+        <div id="tur-spiller" class="tur-spiller hidden">
+          <button class="spiller-close" onclick="stoppSpiller()" aria-label="Lukk">✕</button>
+          <div class="spiller-topp">
+            <div class="spiller-dag-badge" id="spiller-dag-nr">Dag 1</div>
+            <div class="spiller-tekst">
+              <div class="spiller-dato" id="spiller-dato">Fredag 12. juni</div>
+              <div class="spiller-sted" id="spiller-sted">Laster…</div>
+            </div>
+          </div>
+          <div class="spiller-piller" id="spiller-aktiviteter"></div>
+          <div class="spiller-notat" id="spiller-notat"></div>
+          <div class="spiller-nav-row">
+            <button id="spiller-forrige" class="spiller-nav-btn" onclick="forrigeSpillerDag()">◀</button>
+            <span id="spiller-progress" class="spiller-progress">1 / 9</span>
+            <button id="spiller-neste" class="spiller-nav-btn" onclick="nesteSpillerDag()">▶</button>
+          </div>
+        </div>
       </div>
 
       <!-- Tegnforklaring -->
@@ -197,11 +221,11 @@
           </div>
           <div class="summary-item">
             <div class="summary-label">Hoteller</div>
-            <div class="summary-value">10 valg</div>
+            <div class="summary-value">11 valg</div>
           </div>
           <div class="summary-item">
             <div class="summary-label">Turer</div>
-            <div class="summary-value">8 ruter</div>
+            <div class="summary-value">10 ruter</div>
           </div>
         </div>
       </div>
@@ -349,10 +373,10 @@
 <script src="lib/leaflet.js"></script>
 
 <!-- App scripts -->
-<script src="js/data.js?v=6"></script>
-<script src="js/map.js?v=6"></script>
-<script src="js/planner.js?v=6"></script>
-<script src="js/app.js?v=6"></script>
+<script src="js/data.js?v=7"></script>
+<script src="js/map.js?v=7"></script>
+<script src="js/planner.js?v=7"></script>
+<script src="js/app.js?v=7"></script>
 
 </body>
 </html>

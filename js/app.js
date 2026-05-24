@@ -393,7 +393,7 @@ function visStedModal(type, id) {
     <div style="margin-bottom:14px;display:flex;flex-direction:column;gap:6px">
       ${h.telefon ? `<div style="font-size:13px;color:#5a6b7c">📞 <a href="tel:${h.telefon}" style="color:#2d8c6f">${h.telefon}</a></div>` : ''}
       <div style="font-size:13px;color:#5a6b7c">🏷 Prisklasse: ${h.prisklasse || '–'}</div>
-      ${h.bryllup ? `<div style="font-size:13px;color:#c9a84c;font-weight:600">💒 Bryllupsgjester her 12. juni 2026</div>` : ''}
+      ${h.bryllup ? `<div style="font-size:13px;color:#c9a84c;font-weight:600">💒 Bryllupsgjester her lørdag 13. juni 2026</div>` : ''}
     </div>
 
     <div style="display:flex;flex-direction:column;gap:8px">
@@ -665,6 +665,115 @@ function lagreEgetHotell() {
   visToast('🏨 ' + navn + ' lagt til!');
 }
 
+// =====================================================================
+// TUR-SPILLER — Play-through dag-for-dag navigasjon på kartet
+// =====================================================================
+
+let spillerAktiv = false;
+let spillerDagIndex = 0;
+
+function startSpiller() {
+  // Sørg for at vi er på kart-tab
+  if (currentTab !== 'kart') bytteTab('kart');
+
+  spillerAktiv = true;
+  spillerDagIndex = 0;
+
+  const spiller = document.getElementById('tur-spiller');
+  if (spiller) spiller.classList.remove('hidden');
+
+  document.addEventListener('keydown', spillerKeyHandler);
+  setTimeout(oppdaterSpillerUI, 400); // vent til kart er synlig
+}
+
+function stoppSpiller() {
+  spillerAktiv = false;
+  const spiller = document.getElementById('tur-spiller');
+  if (spiller) spiller.classList.add('hidden');
+  document.removeEventListener('keydown', spillerKeyHandler);
+}
+
+function spillerKeyHandler(e) {
+  if (!spillerAktiv) return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    e.preventDefault();
+    nesteSpillerDag();
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    forrigeSpillerDag();
+  } else if (e.key === 'Escape') {
+    stoppSpiller();
+  }
+}
+
+function nesteSpillerDag() {
+  if (!Array.isArray(currentPlan)) return;
+  if (spillerDagIndex < currentPlan.length - 1) {
+    spillerDagIndex++;
+    oppdaterSpillerUI();
+  }
+}
+
+function forrigeSpillerDag() {
+  if (spillerDagIndex > 0) {
+    spillerDagIndex--;
+    oppdaterSpillerUI();
+  }
+}
+
+function oppdaterSpillerUI() {
+  if (!Array.isArray(currentPlan) || spillerDagIndex >= currentPlan.length) return;
+  const dag = currentPlan[spillerDagIndex];
+
+  const hotell = dag.hotell ? HOTELLER.find(h => h.id === dag.hotell) : null;
+  const hyt    = dag.hotell ? HYTTER.find(h => h.id === dag.hotell)   : null;
+  const lok    = hotell || hyt;
+
+  // Hjelpefunksjon for nullsjekk
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+  set('spiller-dag-nr',  'Dag ' + dag.dag);
+  set('spiller-dato',    dag.dagNavn);
+  set('spiller-sted',    lok ? (lok.navn + ' · ' + lok.sted) : (dag.sted || dag.tittel));
+  set('spiller-progress', (spillerDagIndex + 1) + ' / ' + currentPlan.length);
+
+  const btnForrige = document.getElementById('spiller-forrige');
+  const btnNeste   = document.getElementById('spiller-neste');
+  if (btnForrige) btnForrige.disabled = spillerDagIndex === 0;
+  if (btnNeste)   btnNeste.disabled   = spillerDagIndex === currentPlan.length - 1;
+
+  // Aktivitets-piller
+  const elAkt = document.getElementById('spiller-aktiviteter');
+  if (elAkt) {
+    const bryllupsdag = (dag.dag === 2) ? '<span class="akt-pill">💒 Bryllup</span>' : '';
+    const aktPills = (dag.aktiviteter || []).map(id => {
+      const tur = TURER.find(t => t.id === id);
+      if (!tur) return '';
+      const ikon = tur.vanskelighetsgrad === 'Lett' ? '🟢' :
+                   tur.vanskelighetsgrad === 'Middels' ? '🟡' : '🔴';
+      return `<span class="akt-pill">${ikon} ${tur.navn}</span>`;
+    }).join('');
+    elAkt.innerHTML = bryllupsdag + aktPills;
+  }
+
+  // Notat (2 linjer maks)
+  const elNotat = document.getElementById('spiller-notat');
+  if (elNotat) {
+    elNotat.textContent = dag.notater || '';
+    elNotat.style.display = dag.notater ? '' : 'none';
+  }
+
+  // Flytt kart til lokasjon
+  setTimeout(() => {
+    if (lok) {
+      flyToLocation(lok.lat, lok.lng, 13);
+    } else if (dag.aktiviteter && dag.aktiviteter.length > 0) {
+      const tur = TURER.find(t => t.id === dag.aktiviteter[0]);
+      if (tur) flyToLocation(tur.startLat, tur.startLng, 13);
+    }
+  }, 120);
+}
+
 // Eksporter til globalt scope for HTML onclick-hendelser
 window.bytteTab = bytteTab;
 window.toggleDagCard = toggleDagCard;
@@ -689,3 +798,7 @@ window.lagreEgetHotell = lagreEgetHotell;
 window.oppdaterEhLagreBtn = oppdaterEhLagreBtn;
 window.velgDagForHotell = velgDagForHotell;
 window.velgDagForTur = velgDagForTur;
+window.startSpiller = startSpiller;
+window.stoppSpiller = stoppSpiller;
+window.nesteSpillerDag = nesteSpillerDag;
+window.forrigeSpillerDag = forrigeSpillerDag;

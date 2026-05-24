@@ -97,8 +97,8 @@ function lagReiseoversikt() {
       return `<span class="akt-pill">${ikon} ${tur.navn}</span>`;
     }).join('');
 
-    // Bryllups-pill for dag 1
-    const ekstraPills = (dag.dag === 1) ? '<span class="akt-pill">💒 Bryllup</span>' : '';
+    // Bryllups-pill for dag 2 (lørdag — bryllupsdagen)
+    const ekstraPills = (dag.dag === 2) ? '<span class="akt-pill">💒 Bryllup 💍</span>' : '';
 
     // Bruk hotellets faktiske by, ikke det generiske regionhintet
     const visStedTekst = erBooket

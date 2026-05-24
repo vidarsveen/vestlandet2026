@@ -1342,3 +1342,174 @@ a:hover { text-decoration: underline; }
 .field-input::placeholder {
   color: #a0adb8;
 }
+
+/* ==========================================================================
+   TUR-SPILLER — Play-through dag-for-dag navigasjon på kartet
+   ========================================================================== */
+
+/* Trigger-knapp øverst til høyre på kartet */
+.spill-trigger-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 401;
+  background: var(--navy);
+  color: var(--white);
+  border: none;
+  border-radius: 20px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(26,58,92,0.45);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  transition: background 0.15s, transform 0.1s;
+  letter-spacing: 0.2px;
+}
+
+.spill-trigger-btn:hover  { background: var(--navy-light); }
+.spill-trigger-btn:active { transform: scale(0.95); }
+
+/* Spiller-panelet (overlay på bunnen av kartet) */
+.tur-spiller {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(10, 22, 44, 0.93);
+  color: var(--white);
+  padding: 13px 16px 10px;
+  z-index: 400;
+  border-top: 1px solid rgba(255,255,255,0.10);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tur-spiller.hidden {
+  transform: translateY(100%);
+}
+
+/* Lukk-knapp */
+.spiller-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: rgba(255,255,255,0.14);
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  color: var(--white);
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.spiller-close:hover { background: rgba(255,255,255,0.25); }
+
+/* Topp-rad: dagbadge + tekst */
+.spiller-topp {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 7px;
+  padding-right: 32px; /* plass til lukk-knapp */
+}
+
+.spiller-dag-badge {
+  background: var(--gull);
+  color: var(--navy);
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.spiller-tekst {
+  flex: 1;
+  min-width: 0;
+}
+
+.spiller-dato {
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.spiller-sted {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Aktivitets-piller */
+.spiller-piller {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 6px;
+}
+
+.spiller-piller .akt-pill {
+  background: rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.9);
+  border-radius: 12px;
+}
+
+/* Notat */
+.spiller-notat {
+  font-size: 12px;
+  color: rgba(255,255,255,0.58);
+  line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  margin-bottom: 9px;
+}
+
+/* Navigasjonsrad */
+.spiller-nav-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.spiller-nav-btn {
+  flex: 1;
+  background: rgba(255,255,255,0.12);
+  color: var(--white);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: var(--radius-sm);
+  padding: 9px 0;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.spiller-nav-btn:hover    { background: rgba(255,255,255,0.22); }
+.spiller-nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+.spiller-progress {
+  font-size: 13px;
+  color: rgba(255,255,255,0.65);
+  font-weight: 600;
+  text-align: center;
+  min-width: 44px;
+  white-space: nowrap;
+}

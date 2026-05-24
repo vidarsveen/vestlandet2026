@@ -210,6 +210,23 @@ const HOTELLER = [
     wiki: 'https://no.wikipedia.org/wiki/L%C3%A6rdal',
     bookingSearch: 'Lindstrøm Hotel Lærdal Norway',
     bookingSlug: 'lindstra-m'
+  },
+  {
+    id: 'brimibue',
+    navn: 'Brimibue Hotell',
+    sted: 'Brimibue',
+    region: 'Hardanger',
+    lat: 59.8600,
+    lng: 6.1300,
+    stjerner: 3,
+    prisklasse: '🟡🟡',
+    beskrivelse: 'Stemningsfullt fjordhotell i Brimibue med naturskjønne omgivelser. Godt utgangspunkt for fjordturer og naturopplevelser i det sørlige Hardanger.',
+    fasiliteter: ['Restaurant', 'Fjordnær', 'Parkering', 'WiFi'],
+    telefon: '',
+    web: null,
+    wiki: null,
+    bookingSearch: 'Brimibue Hotell Hardanger',
+    bookingSlug: 'brimibue'
   }
 ];
 
@@ -512,6 +529,31 @@ const TURER = [
       [60.8810, 6.8450]
     ],
     farge: '#2d8c6f'
+  },
+  {
+    id: 'oksen',
+    navn: 'Oksen',
+    undertittel: 'Panoramautsikt over Hardangerfjorden fra Jondal',
+    region: 'Hardanger',
+    vanskelighetsgrad: 'Krevende',
+    varighet: '3–4 timer',
+    distanse: '6 km',
+    stigning: '580 m',
+    beskrivelse: 'Turen til Oksen byr på spektakulær 360-graders utsikt over Hardangerfjorden, Folgefonna og fjellene rundt. En av de mer krevende toppturene i Hardanger med den belønningen.',
+    startLat: 60.2310,
+    startLng: 6.1760,
+    utNoUrl: 'https://ut.no/turforslag/1111229/oksen',
+    merInfo: 'Start fra Jondal sentrum. Bratt og krevende oppstigning – solid fottøy nødvendig. Anbefalte forhold: oppholdsvær og sikt. Retur samme vei.',
+    koordinater: [
+      [60.2310, 6.1760],
+      [60.2285, 6.1728],
+      [60.2258, 6.1698],
+      [60.2232, 6.1670],
+      [60.2208, 6.1645],
+      [60.2185, 6.1622]
+    ],
+    farge: '#e8a020',
+    anbefalt: true
   }
 ];
 
@@ -635,10 +677,10 @@ const STANDARD_PLAN = [
     dato: '2026-06-12',
     dagNavn: 'Fredag 12. juni',
     sted: 'Ulvik',
-    tittel: '💒 Bryllup i Ulvik – Brakanes',
+    tittel: 'Ankomst Ulvik – Brakanes',
     hotell: 'brakanes',
     aktiviteter: [],
-    notater: 'Ankomst Brakanes Hotell. Vi er gjester i et bryllup 🥂 Fest og feiring langs fjorden. Første av to netter på Brakanes. Parkering inkludert ved hotellet.',
+    notater: 'Ankomst Brakanes Hotell, Ulvik. Sjekk inn, slå seg til ro og utforsk hotellet og Ulvik sentrum. Bryllupet er i morgen – lørdag! 🌸 Smak på lokal eplesider, nyt fjordutsikten.',
     egne: []
   },
   {
@@ -646,10 +688,10 @@ const STANDARD_PLAN = [
     dato: '2026-06-13',
     dagNavn: 'Lørdag 13. juni',
     sted: 'Ulvik',
-    tittel: 'Dagen etter bryllupet – Ulvik',
+    tittel: '💒 Bryllup i Ulvik – Lørdag',
     hotell: 'brakanes',
     aktiviteter: [],
-    notater: 'Andre natt på Brakanes. Slapp dag etter bryllupet. Utforsk Ulvik sentrum, smak på lokal eplesider hos Hardanger Saft og Siderfabrikk. Aftenstur langs fjorden. 🍎',
+    notater: 'Bryllupsdag! Vi er gjester i et bryllup i Ulvik – Brakanes Hotell. Fest og feiring langs Hardangerfjorden. 🥂🎉 Andre og siste natt på Brakanes.',
     egne: []
   },
   {

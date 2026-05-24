@@ -325,10 +325,10 @@ function visReiserute() {
     // Bare tegn linje hvis dagene er etterfølgende i planen
     if (til.dag === fra.dag + 1) {
       L.polyline([[fra.lat, fra.lng], [til.lat, til.lng]], {
-        color: '#e8a020',
-        weight: 3,
+        color: '#cc2222',
+        weight: 4,
         opacity: 0.9,
-        dashArray: '10 7',
+        dashArray: null,
         lineCap: 'round'
       }).addTo(reiseruteLag);
     }
@@ -361,11 +361,12 @@ function visReiserute() {
       const tur = TURER.find(t => t.id === turId);
       if (!tur || !tur.koordinater) return;
 
-      // Tykk fremhevet polyline for planlagt tur
+      // Stiplet rød fremhevet polyline for planlagt tur
       L.polyline(tur.koordinater, {
-        color: '#e8a020',
-        weight: 7,
+        color: '#cc2222',
+        weight: 5,
         opacity: 0.9,
+        dashArray: '8 5',
         lineCap: 'round',
         lineJoin: 'round'
       }).bindPopup(`
