@@ -163,13 +163,17 @@ function renderSteder(filter) {
     hoteller:      filter === 'alle' || filter === 'hoteller',
     hytter:        filter === 'alle' || filter === 'hytter',
     turer:         filter === 'alle' || filter === 'turer',
-    severdigheter: filter === 'alle' || filter === 'severdigheter'
+    severdigheter: filter === 'alle' || filter === 'severdigheter',
+    restauranter:  filter === 'alle' || filter === 'restauranter',
+    aktiviteter:   filter === 'alle' || filter === 'aktiviteter'
   };
 
   if (visBtyper.hoteller)      HOTELLER.forEach(h => { totalt++; if (matcherSøk(h)) alle.push({ type: 'hotell',      data: h }); });
   if (visBtyper.hytter)        HYTTER.forEach(h =>   { totalt++; if (matcherSøk(h)) alle.push({ type: 'hytte',       data: h }); });
   if (visBtyper.turer)         TURER.forEach(t =>    { totalt++; if (matcherSøk(t)) alle.push({ type: 'tur',         data: t }); });
   if (visBtyper.severdigheter) SEVERDIGHETER.forEach(s => { totalt++; if (matcherSøk(s)) alle.push({ type: 'severdighet', data: s }); });
+  if (visBtyper.restauranter)  RESTAURANTER.forEach(r => { totalt++; if (matcherSøk(r)) alle.push({ type: 'restaurant',  data: r }); });
+  if (visBtyper.aktiviteter)   AKTIVITETER.forEach(a => { totalt++; if (matcherSøk(a)) alle.push({ type: 'aktivitet',   data: a }); });
 
   oppdaterSøkAntall(alle.length, totalt);
 
@@ -184,10 +188,12 @@ function renderSteder(filter) {
   }
 
   alle.forEach(({ type, data }) => {
-    if (type === 'hotell')      container.appendChild(lagHotellCard(data));
-    else if (type === 'hytte')  container.appendChild(lagHytteCard(data));
-    else if (type === 'tur')    container.appendChild(lagTurCard(data));
-    else                        container.appendChild(lagSeverdCard(data));
+    if (type === 'hotell')       container.appendChild(lagHotellCard(data));
+    else if (type === 'hytte')   container.appendChild(lagHytteCard(data));
+    else if (type === 'tur')     container.appendChild(lagTurCard(data));
+    else if (type === 'restaurant') container.appendChild(lagRestaurantCard(data));
+    else if (type === 'aktivitet')  container.appendChild(lagAktivitetCard(data));
+    else                         container.appendChild(lagSeverdCard(data));
   });
 }
 
@@ -300,6 +306,59 @@ function lagSeverdCard(s) {
       <div class="btn-group">
         ${s.web ? `<a class="btn btn-outline btn-sm" href="${s.web}" target="_blank" rel="noopener">🌐 Les mer</a>` : ''}
         <button class="btn btn-fjord btn-sm" onclick="visIDagPaKart(${s.lat}, ${s.lng})">🗺 Vis på kart</button>
+      </div>
+    </div>`;
+  return div;
+}
+
+// ---- Restaurant-kort ----
+function lagRestaurantCard(r) {
+  const div = document.createElement('div');
+  div.className = 'sted-card';
+  div.innerHTML = `
+    <div class="sted-card-header">
+      <div class="sted-icon-wrap" style="background:#c0392b;font-size:18px;display:flex;align-items:center;justify-content:center">${r.emoji || '🍽️'}</div>
+      <div class="sted-info">
+        <div class="sted-navn">${r.navn}</div>
+        <div class="sted-sub">${r.sted} · ${r.region}</div>
+      </div>
+    </div>
+    <div class="sted-card-body">
+      <div class="sted-desc">${r.beskrivelse}</div>
+      <div class="sted-meta">
+        <span class="tag tag-red">${r.type}</span>
+        <span class="tag" style="background:#fff8e8;color:#a0620a">${r.priskategori}</span>
+      </div>
+      <div class="btn-group">
+        <a class="btn btn-outline btn-sm" href="${r.url}" target="_blank" rel="noopener">🌐 Nettside</a>
+        <button class="btn btn-fjord btn-sm" onclick="event.stopPropagation();visIDagPaKart(${r.lat}, ${r.lng})">🗺 Vis på kart</button>
+      </div>
+    </div>`;
+  return div;
+}
+
+// ---- Aktivitet-kort ----
+function lagAktivitetCard(a) {
+  const div = document.createElement('div');
+  div.className = 'sted-card';
+  div.innerHTML = `
+    <div class="sted-card-header">
+      <div class="sted-icon-wrap" style="background:#16a085;font-size:18px;display:flex;align-items:center;justify-content:center">${a.emoji || '🎯'}</div>
+      <div class="sted-info">
+        <div class="sted-navn">${a.navn}</div>
+        <div class="sted-sub">${a.sted} · ${a.region}</div>
+      </div>
+    </div>
+    <div class="sted-card-body">
+      <div class="sted-desc">${a.beskrivelse}</div>
+      <div class="sted-meta">
+        <span class="tag" style="background:#e0f5f1;color:#16a085">${a.type}</span>
+        <span class="tag tag-sky">⏱ ${a.varighet}</span>
+        <span class="tag" style="background:#f0fde8;color:#3a7d1a">💰 ${a.pris}</span>
+      </div>
+      <div class="btn-group">
+        <a class="btn btn-outline btn-sm" href="${a.url}" target="_blank" rel="noopener">🌐 Mer info</a>
+        <button class="btn btn-fjord btn-sm" onclick="event.stopPropagation();visIDagPaKart(${a.lat}, ${a.lng})">🗺 Vis på kart</button>
       </div>
     </div>`;
   return div;

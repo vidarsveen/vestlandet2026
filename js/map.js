@@ -8,10 +8,12 @@ let layers = {
   hytter: null,
   turer: null,
   severdigheter: null,
-  camping: null
+  camping: null,
+  restauranter: null,
+  aktiviteter: null
 };
 
-let activeFilters = new Set(['hoteller', 'hytter', 'turer', 'severdigheter']);
+let activeFilters = new Set(['hoteller', 'hytter', 'turer', 'severdigheter', 'restauranter', 'aktiviteter']);
 let reiseruteLag  = null;
 let reiseruteAktiv = true;   // vises automatisk
 
@@ -21,6 +23,8 @@ const COLORS = {
   hytte:       '#2d8c6f',
   tur:         '#e8a020',
   severdighet: '#8b4cbc',
+  restaurant:  '#c0392b',
+  aktivitet:   '#16a085',
   camping:     '#d45500'
 };
 
@@ -65,6 +69,8 @@ function initMap() {
   leggTilTurer();
   leggTilSeverdigheter();
   leggTilCamping();
+  leggTilRestauranter();
+  leggTilAktiviteter();
 
   // Tilpass kart til alle markører
   const alleBounds = [];
@@ -242,6 +248,44 @@ function leggTilCamping() {
   // Camping er inkludert i hytter-laget
 }
 
+// ---- Restauranter ----
+function leggTilRestauranter() {
+  layers.restauranter = L.layerGroup();
+  RESTAURANTER.forEach(r => {
+    const ikon = lagMarkørIkon(COLORS.restaurant, r.emoji || '🍽️', 30);
+    const marker = L.marker([r.lat, r.lng], { icon: ikon });
+    marker.bindPopup(`
+      <div class="map-popup">
+        <div class="map-popup-type">${r.emoji || '🍽️'} ${r.type} · ${r.region}</div>
+        <div class="map-popup-title">${r.navn}</div>
+        <div class="map-popup-info">${r.sted} · ${r.priskategori}</div>
+        <p style="font-size:12px;margin:6px 0 8px">${r.beskrivelse}</p>
+        <a class="btn btn-outline btn-sm" href="${r.url}" target="_blank" rel="noopener">🌐 Nettside →</a>
+      </div>`, { maxWidth: 240 });
+    layers.restauranter.addLayer(marker);
+  });
+  layers.restauranter.addTo(map);
+}
+
+// ---- Aktiviteter ----
+function leggTilAktiviteter() {
+  layers.aktiviteter = L.layerGroup();
+  AKTIVITETER.forEach(a => {
+    const ikon = lagMarkørIkon(COLORS.aktivitet, a.emoji || '🎯', 30);
+    const marker = L.marker([a.lat, a.lng], { icon: ikon });
+    marker.bindPopup(`
+      <div class="map-popup">
+        <div class="map-popup-type">${a.emoji || '🎯'} ${a.type} · ${a.region}</div>
+        <div class="map-popup-title">${a.navn}</div>
+        <div class="map-popup-info">${a.varighet} · ${a.pris}</div>
+        <p style="font-size:12px;margin:6px 0 8px">${a.beskrivelse}</p>
+        <a class="btn btn-outline btn-sm" href="${a.url}" target="_blank" rel="noopener">🌐 Mer info →</a>
+      </div>`, { maxWidth: 240 });
+    layers.aktiviteter.addLayer(marker);
+  });
+  layers.aktiviteter.addTo(map);
+}
+
 // ---- Filterkontroll ----
 function toggleMapFilter(type) {
   if (activeFilters.has(type)) {
@@ -271,7 +315,7 @@ function leggTilHotellMarkør(h) {
 // ---- Flytt kart til lokasjon ----
 function flyToLocation(lat, lng, zoom = 13) {
   if (!map) return;
-  map.flyTo([lat, lng], zoom, { duration: 1.2 });
+  map.flyTo([lat, lng], zoom, { duration: 2.4 });
 }
 
 // ---- Resize fix ----

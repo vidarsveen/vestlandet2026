@@ -486,25 +486,30 @@ const TURER = [
   {
     id: 'molden',
     navn: 'Molden',
-    undertittel: 'Utsikt over Lustrafjorden fra Solvorn',
+    undertittel: 'Utsikt over Lustrafjorden – 1121 moh',
     region: 'Luster & Jostedalsbreen',
     vanskelighetsgrad: 'Middels',
-    varighet: '4 timer',
+    varighet: '4–5 timer',
     distanse: '8 km',
-    stigning: '610 m',
-    beskrivelse: 'En av Norges vakreste utsiktsturer! Fra Solvorn klatrer du opp til Molden (610 moh) med panoramautsikt over den innerste delen av Sognefjorden. Spektakulær 360°-utsikt over Lustrafjorden, Urnes og Jostedalsbreen.',
-    startLat: 61.3730,
-    startLng: 7.2810,
-    utNoUrl: 'https://www.ut.no/kart/#14/61.374/7.278',
-    merInfo: 'Start fra Solvorn sentrum (fergeleie). Bratt og krevende oppstigning – godt fottøy nødvendig. Retur samme vei eller via Ornes med ferge tilbake.',
+    stigning: '620 m',
+    beskrivelse: 'En av Norges vakreste utsiktsturer! Klatre opp til Molden (1121 moh) med panoramautsikt over den innerste delen av Sognefjorden. Spektakulær 360°-utsikt over Lustrafjorden, Urnes og Jostedalsbreen.',
+    startLat: 61.3363,
+    startLng: 7.3057,
+    utNoUrl: 'https://www.ut.no/kart/#13/61.360/7.305',
+    merInfo: 'Start fra Mollandsmarki-parkering (ta av fra Rv55 ved skilt mot Mollandsmarki, kjør 2,4 km til parkering). Herfra følger du sti mot øst og nord opp ryggen til toppen. Godt fottøy nødvendig. Retur samme vei.',
     koordinater: [
-      [61.3730, 7.2810],
-      [61.3752, 7.2778],
-      [61.3773, 7.2745],
-      [61.3795, 7.2710],
-      [61.3818, 7.2680],
-      [61.3840, 7.2648],
-      [61.3858, 7.2620]
+      [61.3363, 7.3057],
+      [61.3395, 7.3075],
+      [61.3430, 7.3068],
+      [61.3470, 7.3090],
+      [61.3510, 7.3082],
+      [61.3550, 7.3094],
+      [61.3595, 7.3088],
+      [61.3640, 7.3095],
+      [61.3690, 7.3086],
+      [61.3745, 7.3092],
+      [61.3800, 7.3090],
+      [61.3830, 7.3090]
     ],
     farge: '#e8a020',
     anbefalt: true
@@ -641,33 +646,6 @@ const SEVERDIGHETER = [
 ];
 
 // =====================================================================
-// RESTAURANTER & STEDER (utvalg)
-// =====================================================================
-
-const RESTAURANTER = [
-  {
-    id: 'aegir',
-    navn: 'Ægir Bryggeri & Pub',
-    sted: 'Flåm',
-    lat: 60.8635,
-    lng: 7.1215,
-    type: 'Bryggeri/Pub',
-    beskrivelse: 'Ikonisk vikinginspiret bryggeri i Flåm. Hjemmebryggede øl, god mat og fantastisk atmosfære. Bestill bord på forhånd!',
-    web: 'https://www.flamsbrygga.no/aegir'
-  },
-  {
-    id: 'cider-hardanger',
-    navn: 'Hardanger Saft og Siderfabrikk',
-    sted: 'Ulvik',
-    lat: 60.5700,
-    lng: 6.9060,
-    type: 'Mat & Drikke',
-    beskrivelse: 'Smak på Hardangers berømte eple-sider og saft direkte fra produsenten. Gratis smaking. Must-visit i Ulvik!',
-    web: 'https://www.hardanger-saft.no'
-  }
-];
-
-// =====================================================================
 // DAGPLAN — standard itinerær (redigerbart av bruker)
 // =====================================================================
 
@@ -783,7 +761,6 @@ const LENKER = [
     items: [
       { navn: 'DNT – Den Norske Turistforening', url: 'https://www.dnt.no', beskrivelse: 'Hytter, turer og DNT-medlemskap' },
       { navn: 'DNT hytteoversikt', url: 'https://www.dnt.no/hytter/', beskrivelse: 'Finn og book DNT-hytter' },
-      { navn: 'DNT Hytte-booking', url: 'https://www.dnt.no/hyttebooking/', beskrivelse: 'Book betjente DNT-hytter' },
       { navn: 'UT.no – turplanlegger', url: 'https://www.ut.no', beskrivelse: 'Kart, turer og turlogg' }
     ]
   },
@@ -804,5 +781,217 @@ const LENKER = [
       { navn: 'Norgeskart', url: 'https://www.norgeskart.no', beskrivelse: 'Offisielle norske topografiske kart' },
       { navn: 'yr.no – Vær', url: 'https://www.yr.no/nb/v%C3%A6rvarsel/1-92416/Norge/Vestland/Ulvik/Ulvik', beskrivelse: 'Værvarsel for Hardanger' }
     ]
+  }
+];
+
+// =====================================================================
+// RESTAURANTER — Utvalgte spisesteder langs ruten
+// =====================================================================
+const RESTAURANTER = [
+  {
+    id: 'aegir-bryggeri',
+    navn: 'Ægir Bryggeri & Pub',
+    sted: 'Flåm',
+    region: 'Flåm & Aurland',
+    lat: 60.8626, lng: 7.1210,
+    type: 'Bryggeri / Pub',
+    priskategori: '🟡🟡',
+    beskrivelse: 'Berømt håndverksbryggeri i vikingstil – ett av Norges mest besøkte spisesteder. Spektakulær longhouse-atmosfære med lokalt bryggede øl og solid mat.',
+    url: 'https://www.aegirbrewing.com',
+    emoji: '🍺'
+  },
+  {
+    id: 'flamsbrygga-restaurant',
+    navn: 'Flåmsbrygga Restaurant & Bar',
+    sted: 'Flåm',
+    region: 'Flåm & Aurland',
+    lat: 60.8635, lng: 7.1222,
+    type: 'Restaurant',
+    priskategori: '🟡🟡🟡',
+    beskrivelse: 'Moderne nordisk mat med panoramautsikt over Flåmsfjorden. Ferske råvarer fra lokale produsenter – perfekt etter Flåmsbana.',
+    url: 'https://www.flamsbrygga.no',
+    emoji: '🍽️'
+  },
+  {
+    id: 'brakanes-restaurant',
+    navn: 'Brakanes Hotell Restaurant',
+    sted: 'Ulvik',
+    region: 'Hardanger',
+    lat: 60.5664, lng: 6.9147,
+    type: 'Hotellrestaurant',
+    priskategori: '🟡🟡🟡',
+    beskrivelse: 'Klassisk hardangerrestaurant med vid fjordutsikt. Norsk tradisjonsmat og lokale råvarer fra Hardangerfjorden.',
+    url: 'https://www.brakanes-hotel.no',
+    emoji: '🍽️'
+  },
+  {
+    id: 'ullensvang-restaurant',
+    navn: 'Hotel Ullensvang Restaurant',
+    sted: 'Lofthus',
+    region: 'Hardanger',
+    lat: 60.3666, lng: 6.7380,
+    type: 'Hotellrestaurant',
+    priskategori: '🟡🟡🟡',
+    beskrivelse: 'Historisk restaurant med utsikt over Sørfjorden og Folgefonna-breen. Edvard Grieg var fast gjest. Ekte hardangertradisjon siden 1846.',
+    url: 'https://www.hotel-ullensvang.no',
+    emoji: '🍽️'
+  },
+  {
+    id: 'kviknes-restaurant',
+    navn: 'Kviknes Hotel Restaurant',
+    sted: 'Balestrand',
+    region: 'Balestrand & Sogndal',
+    lat: 61.2000, lng: 6.5227,
+    type: 'Hotellrestaurant',
+    priskategori: '🟡🟡🟡',
+    beskrivelse: 'Storstue i sveitserstil (1752) med Sognefjord-utsikt. Klassisk norsk husmannskost og buffet – en opplevelse i seg selv.',
+    url: 'https://www.kviknes.no',
+    emoji: '🍽️'
+  },
+  {
+    id: 'walaker-restaurant',
+    navn: 'Walaker Hotel Restaurant',
+    sted: 'Solvorn',
+    region: 'Luster & Jostedalsbreen',
+    lat: 61.3370, lng: 7.2840,
+    type: 'Hotellrestaurant',
+    priskategori: '🟡🟡',
+    beskrivelse: 'Norges eldste hotell i familiedrift (1640). Romantisk restaurant ved Lustrafjorden – nydelig utsikt og god husmannskost.',
+    url: 'https://www.walaker.com',
+    emoji: '🍽️'
+  },
+  {
+    id: 'lindstrom-restaurant',
+    navn: 'Lindstrøm Hotel Restaurant',
+    sted: 'Lærdal',
+    region: 'Lærdal & Borgund',
+    lat: 61.0998, lng: 7.4793,
+    type: 'Hotellrestaurant',
+    priskategori: '🟡🟡',
+    beskrivelse: 'Koselig restaurant midt i historiske Gamle Lærdalsøyri. Norske fjellspesialiteter og hjemmelaget mat i sjarmerende omgivelser.',
+    url: 'https://lindstromhotel.no',
+    emoji: '🍽️'
+  },
+  {
+    id: 'hardanger-eplegard',
+    navn: 'Hardanger Eplegård & Sider-smaking',
+    sted: 'Ulvik-området',
+    region: 'Hardanger',
+    lat: 60.5720, lng: 6.9250,
+    type: 'Gårdsopplevelse',
+    priskategori: '🟡',
+    beskrivelse: 'Smak ekte Hardanger-sider og eplemost rett fra grenen. Familiedrevne gårder rundt Ulvik tilbyr omvisning og smaking i frukthagene.',
+    url: 'https://www.hardangerfjord.com/hardanger/mat-og-drikke',
+    emoji: '🍎'
+  }
+];
+
+// =====================================================================
+// AKTIVITETER — Opplevelser og guidede turer langs ruten
+// =====================================================================
+const AKTIVITETER = [
+  {
+    id: 'flamsbana',
+    navn: 'Flåmsbana',
+    sted: 'Flåm → Myrdal',
+    region: 'Flåm & Aurland',
+    lat: 60.8628, lng: 7.1218,
+    type: 'Tog / Opplevelse',
+    varighet: '1 time (t/r 2 timer)',
+    pris: 'Fra kr 450/person',
+    beskrivelse: 'En av Norges vakreste jernbanestrekninger – 20 km og 900 høydemeter gjennom fosser, tunneler og dramatisk fjordlandskap.',
+    url: 'https://www.flamsbana.no',
+    emoji: '🚂'
+  },
+  {
+    id: 'naeroy-cruise',
+    navn: 'Nærøyfjord-cruise',
+    sted: 'Gudvangen → Flåm',
+    region: 'Flåm & Aurland',
+    lat: 60.8776, lng: 6.8389,
+    type: 'Båttur',
+    varighet: '2 timer',
+    pris: 'Fra kr 350/person',
+    beskrivelse: 'UNESCO-vernede Nærøyfjorden fra vannflaten. Smal fjord med 1700 m høye fjellvegger – ett av Norges aller vakreste naturundere.',
+    url: 'https://www.norwaysbest.com/no/aktiviteter/fjordcruise/',
+    emoji: '⛵'
+  },
+  {
+    id: 'hardangerfjord-cruise',
+    navn: 'Hardangerfjord-cruise',
+    sted: 'Eidfjord',
+    region: 'Hardanger',
+    lat: 60.4680, lng: 7.0720,
+    type: 'Båttur',
+    varighet: '2–4 timer',
+    pris: 'Fra kr 450/person',
+    beskrivelse: 'Seil på Hardangerfjorden med utsikt til Folgefonna-breen, fossene og frukthagene i blomst. Guidede turer fra Eidfjord.',
+    url: 'https://www.hardangerfjord.com/eidfjord',
+    emoji: '⛵'
+  },
+  {
+    id: 'folgefonna-bre',
+    navn: 'Folgefonna Breklatring',
+    sted: 'Jondal',
+    region: 'Hardanger',
+    lat: 60.2850, lng: 6.5180,
+    type: 'Guidet tur',
+    varighet: '3–5 timer',
+    pris: 'Fra kr 850/person',
+    beskrivelse: 'Gå på Norges tredje største isbre med sertifisert guide. Alt utstyr inkludert. Kjør via Jondal for raskeste tilgang til breen.',
+    url: 'https://www.folgefonnabre.no',
+    emoji: '🧊'
+  },
+  {
+    id: 'kayak-sognefjord',
+    navn: 'Kajakkpadling Sognefjorden',
+    sted: 'Balestrand',
+    region: 'Balestrand & Sogndal',
+    lat: 61.2008, lng: 6.5244,
+    type: 'Aktivitet',
+    varighet: '2–6 timer',
+    pris: 'Fra kr 450/person',
+    beskrivelse: 'Opplev verdensarvens fjord fra vannflaten. Guidede kajakkturer for alle nivåer – padl rolig langs fjellvegger og skjærgård.',
+    url: 'https://www.sognefjord.no/aktiviteter/kajakkpadling',
+    emoji: '🛶'
+  },
+  {
+    id: 'hardanger-museum',
+    navn: 'Hardanger Folkemuseum',
+    sted: 'Utne',
+    region: 'Hardanger',
+    lat: 60.3758, lng: 6.6005,
+    type: 'Museum',
+    varighet: '2–3 timer',
+    pris: 'Kr 150/person',
+    beskrivelse: 'Regionmuseum for Hardanger og Voss. Felemaking, bunad, rosemaling og historiske hus langs fjorden – midt i Hardanger-kulturen.',
+    url: 'https://www.hardangerfolkemuseum.no',
+    emoji: '🏛️'
+  },
+  {
+    id: 'rib-flam',
+    navn: 'RIB-båttur fra Flåm',
+    sted: 'Flåm',
+    region: 'Flåm & Aurland',
+    lat: 60.8628, lng: 7.1215,
+    type: 'Aktivitet',
+    varighet: '2 timer',
+    pris: 'Fra kr 750/person',
+    beskrivelse: 'Adrenalinfylt RIB-tur inn i det smale Nærøyfjorden. Se fjordveggene tett på i høy hastighet – en uforglemmelig opplevelse.',
+    url: 'https://www.visitflam.com/aktiviteter',
+    emoji: '🚤'
+  },
+  {
+    id: 'jostedalsbreen-guide',
+    navn: 'Jostedalsbreen Bretur',
+    sted: 'Sogndal-området',
+    region: 'Luster & Jostedalsbreen',
+    lat: 61.6800, lng: 7.2000,
+    type: 'Guidet tur',
+    varighet: 'Heldagstur',
+    pris: 'Fra kr 950/person',
+    beskrivelse: 'Vandring på Europas største fastlandsbre med guide. Unikt naturøyeblikk – blått is, sprekker og vidstrakte bresider.',
+    url: 'https://www.jostedalsbreen.no',
+    emoji: '🏔️'
   }
 ];

@@ -37,7 +37,7 @@
     <!-- ======= KART-TAB ======= -->
     <section id="kart-pane" class="tab-pane" role="tabpanel">
 
-      <!-- Filter-bar -->
+      <!-- Filter-bar (2 rader) -->
       <div id="map-filter-bar">
         <div class="filter-chip active" data-filter="hoteller" onclick="toggleMapFilter('hoteller')">
           🏨 Hoteller
@@ -49,7 +49,13 @@
           🥾 Turer
         </div>
         <div class="filter-chip active" data-filter="severdigheter" onclick="toggleMapFilter('severdigheter')">
-          📷 Severdigheter
+          📷 Severd.
+        </div>
+        <div class="filter-chip active" data-filter="restauranter" onclick="toggleMapFilter('restauranter')">
+          🍽️ Restauranter
+        </div>
+        <div class="filter-chip active" data-filter="aktiviteter" onclick="toggleMapFilter('aktiviteter')">
+          🎯 Aktiviteter
         </div>
         <div class="filter-chip active" data-filter="reiserute" onclick="toggleReiserute()">
           🚗 Reiserute
@@ -102,6 +108,14 @@
         <div class="legend-item">
           <div class="legend-dot" style="background:#8b4cbc"></div>
           Severdighet
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#c0392b"></div>
+          Restaurant
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#16a085"></div>
+          Aktivitet
         </div>
       </div>
     </section>
@@ -160,7 +174,7 @@
         <div id="søk-antall"></div>
       </div>
 
-      <!-- Filter -->
+      <!-- Filter (2 rader) -->
       <div class="steder-filter-bar">
         <div class="filter-chip active" data-filter="alle" onclick="filterSteder('alle')">
           Alle
@@ -175,7 +189,13 @@
           🥾 Turer
         </div>
         <div class="filter-chip" data-filter="severdigheter" onclick="filterSteder('severdigheter')">
-          📷 Severdigheter
+          📷 Severd.
+        </div>
+        <div class="filter-chip" data-filter="restauranter" onclick="filterSteder('restauranter')">
+          🍽️ Restauranter
+        </div>
+        <div class="filter-chip" data-filter="aktiviteter" onclick="filterSteder('aktiviteter')">
+          🎯 Aktiviteter
         </div>
       </div>
 

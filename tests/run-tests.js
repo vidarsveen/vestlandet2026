@@ -10,12 +10,12 @@ ${src}
 // Export all constants
 ({
   APP_CONFIG, HOTELLER, HYTTER, CAMPING, TURER, SEVERDIGHETER,
-  STANDARD_PLAN, LENKER, lagBookingUrl, lagHotellBookingUrl, datoForDag, RESTAURANTER
+  STANDARD_PLAN, LENKER, lagBookingUrl, lagHotellBookingUrl, datoForDag, RESTAURANTER, AKTIVITETER
 });
 `;
 const appData = vm.runInNewContext(wrapped, { Date, JSON, Array, Object, Math, encodeURIComponent });
 
-const { APP_CONFIG, HOTELLER, HYTTER, TURER, SEVERDIGHETER, STANDARD_PLAN, LENKER, lagBookingUrl, lagHotellBookingUrl, datoForDag } = appData;
+const { APP_CONFIG, HOTELLER, HYTTER, TURER, SEVERDIGHETER, STANDARD_PLAN, LENKER, lagBookingUrl, lagHotellBookingUrl, datoForDag, RESTAURANTER, AKTIVITETER } = appData;
 
 let pass = 0, fail = 0;
 
@@ -208,6 +208,27 @@ t('Visit-sider inkludert', function() {
   if (!alle.includes('hardangerfjord.com')) throw new Error('hardangerfjord.com mangler');
   if (!alle.includes('sognefjord.no')) throw new Error('sognefjord.no mangler');
   return 'hardangerfjord.com + sognefjord.no OK';
+});
+
+// === RESTAURANTER & AKTIVITETER ===
+console.log('\n=== RESTAURANTER & AKTIVITETER ===');
+t('RESTAURANTER count', function() {
+  if (!Array.isArray(RESTAURANTER) || RESTAURANTER.length < 5) throw new Error('For få: ' + (RESTAURANTER ? RESTAURANTER.length : 'undefined'));
+  return RESTAURANTER.length + ' restauranter';
+});
+t('AKTIVITETER count', function() {
+  if (!Array.isArray(AKTIVITETER) || AKTIVITETER.length < 5) throw new Error('For få: ' + (AKTIVITETER ? AKTIVITETER.length : 'undefined'));
+  return AKTIVITETER.length + ' aktiviteter';
+});
+t('Restauranter koordinater gyldige', function() {
+  var u = RESTAURANTER.filter(function(r) { return r.lat < 59.5 || r.lat > 62 || r.lng < 5.5 || r.lng > 9; });
+  if (u.length) throw new Error('Ugyldige: ' + u.map(function(r) { return r.navn; }).join(', '));
+  return RESTAURANTER.length + '/' + RESTAURANTER.length + ' OK';
+});
+t('Aktiviteter koordinater gyldige', function() {
+  var u = AKTIVITETER.filter(function(a) { return a.lat < 59.5 || a.lat > 62 || a.lng < 5.5 || a.lng > 9; });
+  if (u.length) throw new Error('Ugyldige: ' + u.map(function(a) { return a.navn; }).join(', '));
+  return AKTIVITETER.length + '/' + AKTIVITETER.length + ' OK';
 });
 
 // === RESULTAT ===
