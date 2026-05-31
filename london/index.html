@@ -146,6 +146,26 @@
       border-radius: 2px;
       flex-shrink: 0;
     }
+
+    #locate-btn {
+      position: absolute;
+      top: 72px;
+      right: 10px;
+      z-index: 1000;
+      background: var(--white);
+      border: none;
+      border-radius: 8px;
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #locate-btn:active { background: #eee; }
   </style>
 </head>
 <body>
@@ -160,6 +180,7 @@
 </header>
 
 <div id="map"></div>
+<button id="locate-btn" title="Show my location">📍</button>
 
 <div class="info-panel">
   <h2>Parade Route – North London</h2>
@@ -284,15 +305,71 @@
       );
   });
 
-  // Open Emirates popup on load
-  L.marker(stops[0].latlng, { icon: makeIcon(stops[0].emoji, stops[0].bg) })
-    .addTo(map)
-    .bindPopup(
-      '<strong style="color:#EF0107">' + stops[0].title + '</strong>' +
-      '<br><span style="font-size:12px">' + stops[0].body + '</span>',
-      { maxWidth: 220 }
-    )
-    .openPopup();
+  // ── Geolocation ───────────────────────────────────────────────────────────
+  var userMarker = null;
+  var userCircle = null;
+  var watchId   = null;
+
+  var userIcon = L.divIcon({
+    className: '',
+    html: '<div style="' +
+      'width:18px;height:18px;' +
+      'background:#1a73e8;' +
+      'border:3px solid #fff;' +
+      'border-radius:50%;' +
+      'box-shadow:0 0 0 3px rgba(26,115,232,0.35);' +
+    '"></div>',
+    iconSize: [18, 18],
+    iconAnchor: [9, 9]
+  });
+
+  function onPosition(pos) {
+    var lat = pos.coords.latitude;
+    var lng = pos.coords.longitude;
+    var acc = pos.coords.accuracy;
+
+    if (userMarker) {
+      userMarker.setLatLng([lat, lng]);
+      userCircle.setLatLng([lat, lng]).setRadius(acc);
+    } else {
+      userCircle = L.circle([lat, lng], {
+        radius: acc,
+        color: '#1a73e8',
+        fillColor: '#1a73e8',
+        fillOpacity: 0.12,
+        weight: 1
+      }).addTo(map);
+      userMarker = L.marker([lat, lng], { icon: userIcon, zIndexOffset: 500 })
+        .addTo(map)
+        .bindPopup('You are here<br><small>Accuracy: ~' + Math.round(acc) + ' m</small>');
+    }
+    map.setView([lat, lng], Math.max(map.getZoom(), 15));
+  }
+
+  function onError(err) {
+    alert('Could not get your location: ' + err.message);
+  }
+
+  document.getElementById('locate-btn').addEventListener('click', function() {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser.');
+      return;
+    }
+    if (watchId !== null) {
+      navigator.geolocation.clearWatch(watchId);
+      watchId = null;
+      if (userMarker) { map.removeLayer(userMarker); map.removeLayer(userCircle); }
+      userMarker = userCircle = null;
+      this.style.background = '';
+      return;
+    }
+    this.style.background = '#e8f0fe';
+    watchId = navigator.geolocation.watchPosition(onPosition, onError, {
+      enableHighAccuracy: true,
+      maximumAge: 5000,
+      timeout: 10000
+    });
+  });
 </script>
 
 </body>
